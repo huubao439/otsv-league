@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "OTSV Falcons",
+    "shortName": "FAL",
+    "logo": "https://images.unsplash.com/photo-1494172961521-33799ddd43a5?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#22C55E"
+  },
+  {
+    "id": 2,
+    "name": "OTSV Titans",
+    "shortName": "TTN",
+    "logo": "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#F97316"
+  },
+  {
+    "id": 3,
+    "name": "OTSV Wolves",
+    "shortName": "WLV",
+    "logo": "https://images.unsplash.com/photo-1552667466-07770ae110d0?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#06B6D4"
+  },
+  {
+    "id": 4,
+    "name": "OTSV Phoenix",
+    "shortName": "PHX",
+    "logo": "https://images.unsplash.com/photo-1556056504-5c7696c4c28d?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#EAB308"
+  },
+  {
+    "id": 5,
+    "name": "OTSV Storm",
+    "shortName": "STM",
+    "logo": "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#8B5CF6"
+  },
+  {
+    "id": 6,
+    "name": "OTSV Rangers",
+    "shortName": "RNG",
+    "logo": "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=160&q=80",
+    "colorCode": "#EF4444"
+  }
+]
