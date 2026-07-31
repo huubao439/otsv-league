@@ -16,6 +16,19 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Admin Basic Auth
+
+The admin route at `/admin` is protected by HTTP Basic Auth in `src/proxy.ts`.
+
+Set credentials in your local environment before running the app:
+
+```bash
+ADMIN_BASIC_AUTH_USERNAME=your-username
+ADMIN_BASIC_AUTH_PASSWORD=your-password
+```
+
+For local development, add the variables to `.env.local`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
