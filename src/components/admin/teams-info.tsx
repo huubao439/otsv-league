@@ -1,11 +1,11 @@
 "use client";
 
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { PlayerFormDialog } from "@/components/admin/player-form-dialog";
 import { TeamLogo } from "@/components/league/team-logo";
 import { Modal } from "@/components/ui/modal";
-import { addPlayer, removePlayer, updatePlayer, useRoster } from "@/lib/roster-store";
+import { addPlayerAction, removePlayerAction, updatePlayerAction } from "@/app/admin/actions";
 import { type Player, type PlayerDraft, type Team } from "@/lib/types";
 
 const rosterColumns = "grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_72px_84px]";
@@ -28,12 +28,12 @@ function CaptainBadge() {
   );
 }
 
-export function TeamsInfo({ teams }: { teams: Team[] }) {
+export function TeamsInfo({ teams, roster }: { teams: Team[]; roster: Player[] }) {
   // Only one team may be expanded at a time.
   const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
   const [form, setForm] = useState<FormState>(null);
   const [pendingRemoval, setPendingRemoval] = useState<Player | null>(null);
-  const roster = useRoster();
+  const [, startSaving] = useTransition();
 
   const squadOf = (teamId: number) =>
     roster
@@ -45,11 +45,14 @@ export function TeamsInfo({ teams }: { teams: Team[] }) {
       return;
     }
 
-    if (form.mode === "add") {
-      addPlayer(form.team.id, draft);
-    } else {
-      updatePlayer(form.player.id, draft);
-    }
+    const target = form;
+    startSaving(async () => {
+      if (target.mode === "add") {
+        await addPlayerAction(target.team.id, draft);
+      } else {
+        await updatePlayerAction(target.player.id, draft);
+      }
+    });
 
     setForm(null);
   };
@@ -212,7 +215,10 @@ export function TeamsInfo({ teams }: { teams: Team[] }) {
             data-testid="admin-confirm-remove"
             onClick={() => {
               if (pendingRemoval) {
-                removePlayer(pendingRemoval.id);
+                const { id } = pendingRemoval;
+                startSaving(async () => {
+                  await removePlayerAction(id);
+                });
               }
               setPendingRemoval(null);
             }}

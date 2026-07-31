@@ -1,19 +1,25 @@
-"use client";
-
 import Link from "next/link";
 import { FormGuide } from "@/components/league/form-guide";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
-import { ROUNDS, teamFormFrom } from "@/data/league";
-import { useMatches, useSeasonProgress, useStandings } from "@/lib/match-store";
+import {
+  ROUNDS,
+  seasonProgressFrom,
+  standingsWithTeamsFrom,
+  teamFormFrom,
+} from "@/data/league";
+import { getMatches } from "@/lib/server/league-data";
 
 const columns =
   "grid-cols-[48px_minmax(0,1fr)_42px_42px_42px_42px_46px_46px_52px_96px_58px] min-w-[770px]";
 
-export default function StandingsPage() {
-  const rows = useStandings();
-  const progress = useSeasonProgress();
-  const allMatches = useMatches();
+// Always read the shared store so every visitor sees the same table.
+export const dynamic = "force-dynamic";
+
+export default async function StandingsPage() {
+  const allMatches = await getMatches();
+  const rows = standingsWithTeamsFrom(allMatches);
+  const progress = seasonProgressFrom(allMatches);
   const roundsPlayed = Math.floor(progress.played / (progress.total / ROUNDS.length));
 
   return (

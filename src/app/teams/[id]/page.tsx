@@ -7,13 +7,14 @@ import { SquadTable } from "@/components/league/squad-table";
 import { TeamLogo } from "@/components/league/team-logo";
 import {
   formatKickoff,
-  getStandingsWithTeams,
   getTeamById,
-  getTeamFixtures,
-  getTeamForm,
-  getTeamPlayers,
-  getTeamStanding,
+  standingsWithTeamsFrom,
+  teamFormFrom,
+  withTeams,
 } from "@/data/league";
+import { getMatches, getRoster } from "@/lib/server/league-data";
+
+export const dynamic = "force-dynamic";
 
 export default async function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,11 +29,18 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
-  const standing = getTeamStanding(teamId);
-  const ranking = getStandingsWithTeams().findIndex((row) => row.teamId === teamId) + 1;
-  const roster = getTeamPlayers(teamId);
-  const fixtures = getTeamFixtures(teamId);
-  const form = getTeamForm(teamId);
+  const allMatches = await getMatches();
+  const table = standingsWithTeamsFrom(allMatches);
+  const standing = table.find((row) => row.teamId === teamId);
+  const ranking = table.findIndex((row) => row.teamId === teamId) + 1;
+  const roster = (await getRoster())
+    .filter((player) => player.teamId === teamId)
+    .sort((a, b) => a.shirtNumber - b.shirtNumber);
+  const fixtures = allMatches
+    .filter((match) => match.homeTeamId === teamId || match.awayTeamId === teamId)
+    .sort((a, b) => a.round - b.round || `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))
+    .map(withTeams);
+  const form = teamFormFrom(allMatches, teamId);
   const cleanSheets = fixtures.filter(
     (match) =>
       match.status === "finished" &&
@@ -162,7 +170,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
             ))}
           </div>
 
-          <SquadTable teamId={teamId} />
+          <SquadTable roster={roster} />
         </div>
       </div>
     </div>

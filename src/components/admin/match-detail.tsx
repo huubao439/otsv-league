@@ -1,11 +1,11 @@
 "use client";
 
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { TeamLogo } from "@/components/league/team-logo";
-import { ROUNDS, formatKickoff, type MatchWithTeams } from "@/data/league";
-import { saveMatchResult, useMatchesByRound } from "@/lib/match-store";
-import { useRoster } from "@/lib/roster-store";
+import { saveMatchAction } from "@/app/admin/actions";
+import { type FixtureRound } from "@/components/league/fixtures-board";
+import { formatKickoff, type MatchWithTeams } from "@/data/league";
 import { type MatchEvent, type Player, type Team } from "@/lib/types";
 
 const MAX_GOALS = 10;
@@ -244,8 +244,16 @@ function SectionHeader({ title, hint }: { title: string; hint: string }) {
   );
 }
 
-function MatchEditor({ match, onDone }: { match: MatchWithTeams; onDone: () => void }) {
-  const roster = useRoster();
+function MatchEditor({
+  match,
+  roster,
+  onDone,
+}: {
+  match: MatchWithTeams;
+  roster: Player[];
+  onDone: () => void;
+}) {
+  const [, startSaving] = useTransition();
   const [homeScore, setHomeScore] = useState(
     match.homeScore === null ? "" : String(match.homeScore),
   );
@@ -284,11 +292,13 @@ function MatchEditor({ match, onDone }: { match: MatchWithTeams; onDone: () => v
     (parsedAway !== null && parsedAway !== tally(awayGoals));
 
   const save = () => {
-    saveMatchResult(match.id, {
-      homeScore: parsedHome,
-      awayScore: parsedAway,
-      videoHighlightUrl: highlightUrl,
-      events,
+    startSaving(async () => {
+      await saveMatchAction(match.id, {
+        homeScore: parsedHome,
+        awayScore: parsedAway,
+        videoHighlightUrl: highlightUrl,
+        events,
+      });
     });
     onDone();
   };
@@ -394,15 +404,17 @@ function MatchEditor({ match, onDone }: { match: MatchWithTeams; onDone: () => v
 
 function RoundBlock({
   round,
+  matches,
+  roster,
   editingId,
   onEdit,
 }: {
   round: number;
+  matches: MatchWithTeams[];
+  roster: Player[];
   editingId: number | null;
   onEdit: (id: number | null) => void;
 }) {
-  const matches = useMatchesByRound(round);
-
   return (
     <div className="overflow-hidden rounded-[18px] border border-border bg-[var(--surface)]">
       <div className="flex items-center justify-between gap-3 border-b border-border bg-[var(--surface-2)] px-4 py-3 sm:px-5">
@@ -448,7 +460,7 @@ function RoundBlock({
           </div>
 
           {editingId === match.id ? (
-            <MatchEditor match={match} onDone={() => onEdit(null)} />
+            <MatchEditor match={match} roster={roster} onDone={() => onEdit(null)} />
           ) : null}
         </div>
       ))}
@@ -456,13 +468,20 @@ function RoundBlock({
   );
 }
 
-export function MatchDetail() {
+export function MatchDetail({ rounds, roster }: { rounds: FixtureRound[]; roster: Player[] }) {
   const [editingId, setEditingId] = useState<number | null>(null);
 
   return (
     <div className="flex flex-col gap-3">
-      {ROUNDS.map((round) => (
-        <RoundBlock key={round} round={round} editingId={editingId} onEdit={setEditingId} />
+      {rounds.map(({ round, matches }) => (
+        <RoundBlock
+          key={round}
+          round={round}
+          matches={matches}
+          roster={roster}
+          editingId={editingId}
+          onEdit={setEditingId}
+        />
       ))}
     </div>
   );

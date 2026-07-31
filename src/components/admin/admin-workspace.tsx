@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { MatchDetail } from "@/components/admin/match-detail";
 import { TeamsInfo } from "@/components/admin/teams-info";
-import { type Team } from "@/lib/types";
+import { type FixtureRound } from "@/components/league/fixtures-board";
+import { type Player, type Team } from "@/lib/types";
 
 /** Sub-tabs of the Overall workspace. Add further sections here. */
 const subTabs = [
@@ -13,7 +14,15 @@ const subTabs = [
 
 type SubTabId = (typeof subTabs)[number]["id"];
 
-export function AdminWorkspace({ teams }: { teams: Team[] }) {
+export function AdminWorkspace({
+  teams,
+  roster,
+  rounds,
+}: {
+  teams: Team[];
+  roster: Player[];
+  rounds: FixtureRound[];
+}) {
   const [active, setActive] = useState<SubTabId>("teams-info");
 
   return (
@@ -45,8 +54,8 @@ export function AdminWorkspace({ teams }: { teams: Team[] }) {
         </div>
       </div>
 
-      {active === "teams-info" ? <TeamsInfo teams={teams} /> : null}
-      {active === "match-detail" ? <MatchDetail /> : null}
+      {active === "teams-info" ? <TeamsInfo teams={teams} roster={roster} /> : null}
+      {active === "match-detail" ? <MatchDetail rounds={rounds} roster={roster} /> : null}
     </div>
   );
 }

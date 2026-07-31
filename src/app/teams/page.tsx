@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
-import { getStandingsWithTeams } from "@/data/league";
+import { standingsWithTeamsFrom } from "@/data/league";
 import { teams } from "@/data/mock";
+import { getMatches } from "@/lib/server/league-data";
 
-export default function TeamsPage() {
-  const table = getStandingsWithTeams();
+export const dynamic = "force-dynamic";
+
+export default async function TeamsPage() {
+  const table = standingsWithTeamsFrom(await getMatches());
   const rankOf = (teamId: number) => table.findIndex((row) => row.teamId === teamId) + 1;
 
   return (

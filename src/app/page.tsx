@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { Countdown } from "@/components/league/countdown";
@@ -7,28 +5,32 @@ import { FormGuide } from "@/components/league/form-guide";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
 import { SectionHeading } from "@/components/league/section-heading";
 import { TeamLogo } from "@/components/league/team-logo";
-import { ROUNDS, formatKickoff, teamFormFrom } from "@/data/league";
 import {
-  useLatestResults,
-  useMatches,
-  useNextKickoffIso,
-  useNextRoundFixtures,
-  useSeasonProgress,
-  useStandings,
-} from "@/lib/match-store";
+  ROUNDS,
+  formatKickoff,
+  latestResultsFrom,
+  nextKickoffIsoFrom,
+  nextRoundFixturesFrom,
+  seasonProgressFrom,
+  standingsWithTeamsFrom,
+  teamFormFrom,
+} from "@/data/league";
+import { getMatches } from "@/lib/server/league-data";
 
 const tableColumns =
   "grid-cols-[44px_minmax(0,1fr)_40px_40px_40px_40px_52px_92px_52px] min-w-[660px]";
 
-export default function Home() {
-  const table = useStandings();
-  const latestResults = useLatestResults(3);
-  const upcomingFixtures = useNextRoundFixtures();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const allMatches = await getMatches();
+  const table = standingsWithTeamsFrom(allMatches);
+  const latestResults = latestResultsFrom(allMatches, 3);
+  const upcomingFixtures = nextRoundFixturesFrom(allMatches);
   const nextRound = upcomingFixtures.at(0)?.round;
   const opener = upcomingFixtures.at(0);
-  const kickoffIso = useNextKickoffIso();
-  const progress = useSeasonProgress();
-  const allMatches = useMatches();
+  const kickoffIso = nextKickoffIsoFrom(allMatches);
+  const progress = seasonProgressFrom(allMatches);
   const progressPct = Math.max(3, Math.round((progress.played / progress.total) * 100));
 
   return (

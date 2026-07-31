@@ -1,16 +1,20 @@
-"use client";
-
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
-import { getTeamById, getTopScorers } from "@/data/league";
-import { useCleanSheetTable } from "@/lib/match-store";
+import { cleanSheetTableFrom, getTeamById } from "@/data/league";
+import { getMatches, getRoster } from "@/lib/server/league-data";
 
 const defenceColumns = "grid-cols-[36px_minmax(0,1fr)_44px_52px]";
 
-export default function StatsPage() {
-  const topScorers = getTopScorers(10).filter((player) => player.goals > 0);
+export const dynamic = "force-dynamic";
+
+export default async function StatsPage() {
+  const roster = await getRoster();
+  const topScorers = [...roster]
+    .sort((a, b) => b.goals - a.goals || b.assists - a.assists)
+    .slice(0, 10)
+    .filter((player) => player.goals > 0);
   // Ranked by fewest goals conceded — the meanest defence in the league wins.
-  const defence = useCleanSheetTable();
+  const defence = cleanSheetTableFrom(await getMatches());
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">

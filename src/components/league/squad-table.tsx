@@ -1,14 +1,7 @@
-"use client";
+import { type Player } from "@/lib/types";
 
-import { useTeamRoster } from "@/lib/roster-store";
-
-/**
- * Reads the roster store rather than the static JSON so players added or edited
- * in the admin workspace show up here too.
- */
-export function SquadTable({ teamId }: { teamId: number }) {
-  const roster = useTeamRoster(teamId);
-
+/** Squad list; the roster comes from the shared store via the page. */
+export function SquadTable({ roster }: { roster: Player[] }) {
   return (
     <div className="flex flex-col gap-3.5 overflow-hidden rounded-[22px] border border-border bg-[var(--surface)] p-5.5 shadow-[var(--shadow-soft)]">
       <div className="flex items-baseline justify-between gap-3">
