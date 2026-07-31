@@ -7,6 +7,7 @@ const pages = [
   ["/fixtures", "Fixtures"],
   ["/teams", "Teams"],
   ["/stats", "Stats"],
+  ["/rules", "Rules"],
 ] as const;
 
 export function Footer() {

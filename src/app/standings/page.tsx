@@ -10,8 +10,10 @@ import {
 } from "@/data/league";
 import { getMatches } from "@/lib/server/league-data";
 
+// Pos | Team | Pts | P | W | D | L | GF | GA | GD | Form — points sit first so
+// they read as the headline number rather than a trailing total.
 const columns =
-  "grid-cols-[48px_minmax(0,1fr)_42px_42px_42px_42px_46px_46px_52px_96px_58px] min-w-[770px]";
+  "grid-cols-[48px_minmax(0,1fr)_60px_42px_42px_42px_42px_46px_46px_52px_96px] min-w-[770px]";
 
 export default async function StandingsPage() {
   const allMatches = await getMatches();
@@ -47,6 +49,7 @@ export default async function StandingsPage() {
           >
             <span>Pos</span>
             <span>Team</span>
+            <span className="text-center">Pts</span>
             <span className="text-center">P</span>
             <span className="text-center">W</span>
             <span className="text-center">D</span>
@@ -55,7 +58,6 @@ export default async function StandingsPage() {
             <span className="text-center">GA</span>
             <span className="text-center">GD</span>
             <span className="text-center">Form</span>
-            <span className="text-right">Pts</span>
           </div>
 
           {rows.map((row, index) => {
@@ -65,23 +67,26 @@ export default async function StandingsPage() {
               <div
                 key={row.teamId}
                 className={`relative grid ${columns} items-center border-b border-border px-6 py-4 transition-colors last:border-b-0 hover:bg-[var(--surface-2)] ${
-                  leader ? "bg-[image:var(--grad-soft)]" : ""
+                  leader ? "bg-[image:var(--grad-gold-soft)]" : ""
                 }`}
               >
                 {leader ? (
-                  <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
+                  <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad-gold)]" />
                 ) : null}
-                <span className={`font-heading text-[19px] ${leader ? "" : "text-muted-foreground"}`}>
+                <span className={`font-heading text-[19px] ${leader ? "text-[var(--gold)]" : "text-muted-foreground"}`}>
                   {index + 1}
                 </span>
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <TeamLogo team={row.team} size="row" roundedImage={false} />
+                  <TeamLogo team={row.team} size="row" shape="bare" />
                   <Link
                     href={`/teams/${row.teamId}`}
                     className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
                   >
                     {row.team.name}
                   </Link>
+                </span>
+                <span className="grad-text text-center font-heading text-[23px] leading-none">
+                  {row.points}
                 </span>
                 <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
                   {row.played}
@@ -105,14 +110,13 @@ export default async function StandingsPage() {
                   {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
                 </span>
                 <FormGuide form={teamFormFrom(allMatches, row.teamId)} />
-                <span className="text-right font-heading text-[21px]">{row.points}</span>
               </div>
             );
           })}
 
           <div className="flex flex-wrap items-center gap-4.5 bg-[var(--surface-2)] px-6 py-3.5 text-[11.5px] font-semibold leading-none text-[var(--faint)]">
             <span className="flex items-center gap-1.5">
-              <span className="h-[3px] w-3 rounded-sm bg-[image:var(--grad)]" />
+              <span className="h-[3px] w-3 rounded-sm bg-[image:var(--grad-gold)]" />
               Championship place
             </span>
             <span className="ml-auto font-mono tracking-[0.1em]">

@@ -13,6 +13,7 @@ import {
   withTeams,
 } from "@/data/league";
 import { teams } from "@/data/mock";
+import { playerStatsFrom, statsForPlayer } from "@/data/stats";
 import { getMatches, getRoster } from "@/lib/server/league-data";
 
 /** Prerender all six team pages so they are prefetchable like the rest. */
@@ -50,7 +51,12 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
       match.status === "finished" &&
       (match.homeTeamId === teamId ? match.awayScore : match.homeScore) === 0,
   ).length;
-  const cards = roster.reduce((total, player) => total + player.yellowCards + player.redCards, 0);
+  // Cards come from recorded match events, same source as the Stats tab.
+  const playerStats = playerStatsFrom(allMatches);
+  const cards = roster.reduce((total, player) => {
+    const line = statsForPlayer(playerStats, player.id);
+    return total + line.yellowCards + line.redCards;
+  }, 0);
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5 px-4 py-7 pb-18 sm:px-6 lg:px-8 animate-fade-up">
@@ -73,7 +79,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
             />
             <div className="flex min-w-0 flex-col gap-3">
               <span className="font-mono text-[10.5px] font-medium uppercase tracking-[0.2em] text-white/80">
-                {team.department} · Position {ranking}
+                OTSV League 2026 · Position {ranking}
               </span>
               <h1 className="m-0 font-heading text-4xl uppercase leading-[0.94] sm:text-5xl lg:text-[62px]">
                 {team.name}
@@ -131,10 +137,18 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
                 <span className="font-mono text-[10.5px] font-medium leading-none tracking-[0.12em] text-[var(--faint)]">
                   R{match.round}
                 </span>
+                {/* Home and away are not distinguished in this league, so both
+                    sides are shown the same way with this team first. */}
                 <span className="flex min-w-0 items-center gap-2.5">
+                  <TeamLogo team={team} size="sm" />
+                  <span className="truncate text-[13.5px] font-extrabold leading-tight">
+                    {team.name}
+                  </span>
+                  <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--faint)]">
+                    vs
+                  </span>
                   <TeamLogo team={opponent} size="sm" />
                   <span className="truncate text-[13.5px] font-extrabold leading-tight">
-                    {home ? "vs " : "away to "}
                     {opponent.name}
                   </span>
                 </span>
@@ -174,7 +188,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
             ))}
           </div>
 
-          <SquadTable roster={roster} />
+          <SquadTable roster={roster} stats={playerStats} />
         </div>
       </div>
     </div>

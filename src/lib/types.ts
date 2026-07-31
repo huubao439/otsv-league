@@ -1,6 +1,8 @@
 export interface Team {
   id: number;
   name: string;
+  /** Two or three letter crest abbreviation, e.g. "MAT". */
+  abbr: string;
   /** Department the team represents, shown as the team's subtitle. */
   department: string;
   logo: string;
@@ -34,6 +36,9 @@ export type PlayerDraft = {
   shirtNumber: number;
   isCaptain: boolean;
 };
+
+/** One row of a bulk CSV import — a draft plus the team it belongs to. */
+export type PlayerImportRow = PlayerDraft & { teamId: number };
 
 export type MatchStatus = "upcoming" | "live" | "finished";
 

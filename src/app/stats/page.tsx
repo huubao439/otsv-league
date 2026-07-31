@@ -1,18 +1,27 @@
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
 import { cleanSheetTableFrom, getTeamById } from "@/data/league";
+import {
+  RED_CARD_FINE,
+  YELLOW_CARD_FINE,
+  fairPlayTableFrom,
+  topScorersFrom,
+} from "@/data/stats";
 import { getMatches, getRoster } from "@/lib/server/league-data";
+import { formatFine, formatVnd } from "@/lib/vnd";
 
 const defenceColumns = "grid-cols-[36px_minmax(0,1fr)_44px_52px]";
+const fairPlayColumns = "grid-cols-[36px_minmax(0,1fr)_44px_44px_110px]";
 
 export default async function StatsPage() {
-  const roster = await getRoster();
-  const topScorers = [...roster]
-    .sort((a, b) => b.goals - a.goals || b.assists - a.assists)
-    .slice(0, 10)
-    .filter((player) => player.goals > 0);
-  // Ranked by fewest goals conceded — the meanest defence in the league wins.
-  const defence = cleanSheetTableFrom(await getMatches());
+  const [roster, allMatches] = await Promise.all([getRoster(), getMatches()]);
+
+  // Every table below is derived from the match results an admin records, so
+  // the Stats tab always agrees with Fixtures and Standings.
+  const topScorers = topScorersFrom(allMatches, roster, 10);
+  const defence = cleanSheetTableFrom(allMatches);
+  const fairPlay = fairPlayTableFrom(allMatches, roster);
+  const totalFines = fairPlay.reduce((total, row) => total + row.fine, 0);
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
@@ -38,12 +47,12 @@ export default async function StatsPage() {
 
           <div className="flex flex-col gap-2.5">
             {topScorers.length
-              ? topScorers.map((player, index) => {
-                  const team = getTeamById(player.teamId);
+              ? topScorers.map((row, index) => {
+                  const team = getTeamById(row.player.teamId);
 
                   return (
                     <div
-                      key={player.id}
+                      key={row.player.id}
                       className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 ${
                         index === 0
                           ? "border-[var(--border-strong)] bg-[image:var(--grad-soft)]"
@@ -55,12 +64,12 @@ export default async function StatsPage() {
                       </span>
                       {team ? <TeamLogo team={team} size="sm" /> : null}
                       <span className="min-w-0 flex-1 truncate text-[13px]">
-                        <span className="font-bold">{player.name}</span>
+                        <span className="font-bold">{row.player.name}</span>
                         {team ? (
                           <span className="font-normal text-muted-foreground"> ({team.name})</span>
                         ) : null}
                       </span>
-                      <span className="font-heading text-[18px] leading-none">{player.goals}</span>
+                      <span className="font-heading text-[18px] leading-none">{row.goals}</span>
                     </div>
                   );
                 })
@@ -131,6 +140,70 @@ export default async function StatsPage() {
             GA = goals against. The team conceding fewest goals wins the title.
           </p>
         </div>
+      </div>
+
+      {/* Fair play */}
+      <div className="flex flex-col gap-4 overflow-hidden rounded-[20px] border border-border bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="flex flex-col gap-1.5">
+            <h3 className="m-0 font-heading text-xl uppercase">Fair play</h3>
+            <span className="text-[12.5px] font-semibold leading-tight text-muted-foreground">
+              Cards and fines per team, cleanest record first.
+            </span>
+          </div>
+          <span className="font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] text-[var(--faint)]">
+            League total {formatFine(totalFines)} VND
+          </span>
+        </div>
+
+        <div className="-mx-1 overflow-x-auto px-1">
+          <div className="min-w-[420px]">
+            <div
+              className={`grid ${fairPlayColumns} border-b border-border pb-2.5 pl-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--faint)]`}
+            >
+              <span>Pos</span>
+              <span>Team</span>
+              <span className="text-center">YC</span>
+              <span className="text-center">RC</span>
+              <span className="text-right">Fine (VND)</span>
+            </div>
+
+            {/* No leader highlight here — fewest cards is not an achievement to celebrate. */}
+            {fairPlay.map((row, index) => (
+              <div
+                key={row.team.id}
+                data-testid={`fairplay-row-${row.team.id}`}
+                className={`grid ${fairPlayColumns} items-center border-b border-border py-3 pl-3 last:border-b-0`}
+              >
+                <span className="font-heading text-[17px] text-muted-foreground">{index + 1}</span>
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <TeamLogo team={row.team} size="sm" />
+                  <span className="truncate text-[13px] font-extrabold leading-tight">
+                    {row.team.name}
+                  </span>
+                </span>
+                <span className="text-center text-[13px] font-semibold leading-none text-[var(--gold)]">
+                  {row.yellowCards}
+                </span>
+                <span className="text-center text-[13px] font-semibold leading-none text-[var(--pink)]">
+                  {row.redCards}
+                </span>
+                <span
+                  className={`text-right font-heading text-[17px] leading-none ${
+                    row.fine > 0 ? "text-[var(--pink)]" : "text-muted-foreground"
+                  }`}
+                >
+                  {formatFine(row.fine)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="m-0 text-[11.5px] font-semibold leading-[1.4] text-[var(--faint)]">
+          Yellow card {formatVnd(YELLOW_CARD_FINE)} VND · Red card {formatVnd(RED_CARD_FINE)} VND.
+          Fines are shown as a negative balance.
+        </p>
       </div>
     </div>
   );

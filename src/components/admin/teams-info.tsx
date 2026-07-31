@@ -2,6 +2,7 @@
 
 import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { CsvImport } from "@/components/admin/csv-import";
 import { PlayerFormDialog } from "@/components/admin/player-form-dialog";
 import { TeamLogo } from "@/components/league/team-logo";
 import { Modal } from "@/components/ui/modal";
@@ -59,6 +60,13 @@ export function TeamsInfo({ teams, roster }: { teams: Team[]; roster: Player[] }
 
   return (
     <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-border bg-[var(--surface)] px-4 py-3 sm:px-5">
+        <span className="text-[12.5px] font-semibold leading-tight text-muted-foreground">
+          Add a whole squad at once from a CSV file.
+        </span>
+        <CsvImport teams={teams} roster={roster} />
+      </div>
+
       {[...teams]
         .sort((a, b) => a.id - b.id)
         .map((team) => {

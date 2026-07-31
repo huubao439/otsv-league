@@ -17,8 +17,10 @@ import {
 } from "@/data/league";
 import { getMatches } from "@/lib/server/league-data";
 
+// Pos | Team | Pts | P | W | D | L | GD | Form — points sit first so they read
+// as the headline number rather than a trailing total.
 const tableColumns =
-  "grid-cols-[44px_minmax(0,1fr)_40px_40px_40px_40px_52px_92px_52px] min-w-[660px]";
+  "grid-cols-[44px_minmax(0,1fr)_56px_40px_40px_40px_40px_52px_92px] min-w-[660px]";
 
 export default async function Home() {
   const allMatches = await getMatches();
@@ -189,13 +191,13 @@ export default async function Home() {
           >
             <span>Pos</span>
             <span>Team</span>
+            <span className="text-center">Pts</span>
             <span className="text-center">P</span>
             <span className="text-center">W</span>
             <span className="text-center">D</span>
             <span className="text-center">L</span>
             <span className="text-center">GD</span>
             <span className="text-center">Form</span>
-            <span className="text-right">Pts</span>
           </div>
 
           <div className="flex flex-col">
@@ -206,14 +208,16 @@ export default async function Home() {
                 <div
                   key={row.teamId}
                   className={`relative grid ${tableColumns} items-center border-b border-border px-6 py-3.5 transition-colors last:border-b-0 hover:bg-[var(--surface-2)] ${
-                    leader ? "bg-[image:var(--grad-soft)]" : ""
+                    leader ? "bg-[image:var(--grad-gold-soft)]" : ""
                   }`}
                 >
                   {leader ? (
-                    <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
+                    <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad-gold)]" />
                   ) : null}
                   <span
-                    className={`font-heading text-[19px] ${leader ? "" : "text-muted-foreground"}`}
+                    className={`font-heading text-[19px] ${
+                      leader ? "text-[var(--gold)]" : "text-muted-foreground"
+                    }`}
                   >
                     {index + 1}
                   </span>
@@ -225,11 +229,9 @@ export default async function Home() {
                     >
                       {row.team.name}
                     </Link>
-                    {leader ? (
-                      <span className="hidden rounded-[5px] bg-[image:var(--grad)] px-1.5 py-1 font-mono text-[9.5px] font-bold leading-none tracking-[0.08em] text-white sm:inline">
-                        LEADER
-                      </span>
-                    ) : null}
+                  </span>
+                  <span className="grad-text text-center font-heading text-[22px] leading-none">
+                    {row.points}
                   </span>
                   <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
                     {row.played}
@@ -247,7 +249,6 @@ export default async function Home() {
                     {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
                   </span>
                   <FormGuide form={teamFormFrom(allMatches, row.teamId)} />
-                  <span className="text-right font-heading text-[20px]">{row.points}</span>
                 </div>
               );
             })}
@@ -255,7 +256,7 @@ export default async function Home() {
 
           <div className="flex flex-wrap items-center gap-4.5 border-t border-border bg-[var(--surface-2)] px-6 py-3.5 text-[11.5px] font-semibold leading-none text-[var(--faint)]">
             <span className="flex items-center gap-1.5">
-              <span className="h-[3px] w-3 rounded-sm bg-[image:var(--grad)]" />
+              <span className="h-[3px] w-3 rounded-sm bg-[image:var(--grad-gold)]" />
               Championship place
             </span>
             <span className="flex items-center gap-1.5">

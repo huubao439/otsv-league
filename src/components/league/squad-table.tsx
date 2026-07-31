@@ -1,7 +1,18 @@
+import { type PlayerStatLine, statsForPlayer } from "@/data/stats";
 import { type Player } from "@/lib/types";
 
-/** Squad list; the roster comes from the shared store via the page. */
-export function SquadTable({ roster }: { roster: Player[] }) {
+/**
+ * Squad list. Goals and cards come from recorded match events rather than the
+ * fields stored on the player record, so this always agrees with the Stats tab.
+ * Assists stay as stored — there is no way to record one against a match yet.
+ */
+export function SquadTable({
+  roster,
+  stats,
+}: {
+  roster: Player[];
+  stats: Map<number, PlayerStatLine>;
+}) {
   return (
     <div className="flex flex-col gap-3.5 overflow-hidden rounded-[22px] border border-border bg-[var(--surface)] p-5.5 shadow-[var(--shadow-soft)]">
       <div className="flex items-baseline justify-between gap-3">
@@ -25,42 +36,46 @@ export function SquadTable({ roster }: { roster: Player[] }) {
             </tr>
           </thead>
           <tbody>
-            {roster.map((player) => (
-              <tr key={player.id} className="border-b border-border/70 last:border-b-0">
-                <td className="py-2.5 font-mono text-[11px] text-[var(--faint)]">
-                  {player.shirtNumber}
-                </td>
-                <td className="max-w-40 truncate py-2.5 text-[13px] font-bold">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate">{player.name}</span>
-                    {player.isCaptain ? (
-                      <span
-                        title="Team captain"
-                        aria-label="Team captain"
-                        className="grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full bg-[image:var(--grad)] font-heading text-[10px] leading-none text-white"
-                      >
-                        C
-                      </span>
-                    ) : null}
-                  </span>
-                </td>
-                <td className="py-2.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted-foreground">
-                  {player.jerseyName}
-                </td>
-                <td className="py-2.5 text-center text-[13px] font-semibold text-muted-foreground">
-                  {player.goals}
-                </td>
-                <td className="py-2.5 text-center text-[13px] font-semibold text-muted-foreground">
-                  {player.assists}
-                </td>
-                <td className="hidden py-2.5 text-center text-[13px] font-semibold text-muted-foreground sm:table-cell">
-                  {player.yellowCards}
-                </td>
-                <td className="hidden py-2.5 text-center text-[13px] font-semibold text-muted-foreground sm:table-cell">
-                  {player.redCards}
-                </td>
-              </tr>
-            ))}
+            {roster.map((player) => {
+              const line = statsForPlayer(stats, player.id);
+
+              return (
+                <tr key={player.id} className="border-b border-border/70 last:border-b-0">
+                  <td className="py-2.5 font-mono text-[11px] text-[var(--faint)]">
+                    {player.shirtNumber}
+                  </td>
+                  <td className="max-w-40 truncate py-2.5 text-[13px] font-bold">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate">{player.name}</span>
+                      {player.isCaptain ? (
+                        <span
+                          title="Team captain"
+                          aria-label="Team captain"
+                          className="grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full bg-[image:var(--grad)] font-heading text-[10px] leading-none text-white"
+                        >
+                          C
+                        </span>
+                      ) : null}
+                    </span>
+                  </td>
+                  <td className="py-2.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted-foreground">
+                    {player.jerseyName}
+                  </td>
+                  <td className="py-2.5 text-center text-[13px] font-semibold text-muted-foreground">
+                    {line.goals}
+                  </td>
+                  <td className="py-2.5 text-center text-[13px] font-semibold text-muted-foreground">
+                    {player.assists}
+                  </td>
+                  <td className="hidden py-2.5 text-center text-[13px] font-semibold text-muted-foreground sm:table-cell">
+                    {line.yellowCards}
+                  </td>
+                  <td className="hidden py-2.5 text-center text-[13px] font-semibold text-muted-foreground sm:table-cell">
+                    {line.redCards}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

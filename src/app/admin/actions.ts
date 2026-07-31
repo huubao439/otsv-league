@@ -1,9 +1,15 @@
 "use server";
 
 import { revalidatePath, updateTag } from "next/cache";
+import { teams } from "@/data/mock";
 import { LEAGUE_TAG } from "@/lib/server/kv";
 import { getMatches, getRoster, saveMatches, saveRoster } from "@/lib/server/league-data";
-import { type MatchEvent, type Player, type PlayerDraft } from "@/lib/types";
+import {
+  type MatchEvent,
+  type Player,
+  type PlayerDraft,
+  type PlayerImportRow,
+} from "@/lib/types";
 
 /**
  * Every admin write goes through here: mutate the shared store, then
@@ -64,6 +70,85 @@ export async function updatePlayerAction(id: number, draft: PlayerDraft) {
   const next = roster.map((player) => (player.id === id ? { ...player, ...draft } : player));
   await saveRoster(draft.isCaptain ? applyCaptaincy(next, target.teamId, id) : next);
   refresh();
+}
+
+export type ImportResult = {
+  added: number;
+  skipped: { row: string; reason: string }[];
+};
+
+/**
+ * Bulk import from a CSV. Every row is re-validated here — the client-side
+ * preview is only for showing problems early, and cannot be trusted.
+ */
+export async function importPlayersAction(rows: PlayerImportRow[]): Promise<ImportResult> {
+  const roster = await getRoster();
+  const teamIds = new Set(teams.map((team) => team.id));
+  const skipped: ImportResult["skipped"] = [];
+
+  let nextId = roster.reduce((max, player) => Math.max(max, player.id), 0) + 1;
+  let next = [...roster];
+  // Last captain listed for a team wins; applied after every insert.
+  const captainByTeam = new Map<number, number>();
+
+  for (const row of rows) {
+    const name = row.name?.trim() ?? "";
+    const jerseyName = row.jerseyName?.trim() ?? "";
+    const label = name || "(unnamed)";
+
+    if (!name || !jerseyName) {
+      skipped.push({ row: label, reason: "Missing player name or jersey name." });
+      continue;
+    }
+    if (!Number.isInteger(row.shirtNumber) || row.shirtNumber < 1 || row.shirtNumber > 99) {
+      skipped.push({ row: label, reason: "Jersey number must be a whole number 1–99." });
+      continue;
+    }
+    if (!teamIds.has(row.teamId)) {
+      skipped.push({ row: label, reason: `Team ${row.teamId} does not exist.` });
+      continue;
+    }
+    if (
+      next.some(
+        (player) => player.teamId === row.teamId && player.shirtNumber === row.shirtNumber,
+      )
+    ) {
+      skipped.push({ row: label, reason: `Number ${row.shirtNumber} is already taken.` });
+      continue;
+    }
+
+    const player: Player = {
+      id: nextId,
+      teamId: row.teamId,
+      name,
+      jerseyName,
+      shirtNumber: row.shirtNumber,
+      position: "MF",
+      isCaptain: row.isCaptain,
+      goals: 0,
+      assists: 0,
+      yellowCards: 0,
+      redCards: 0,
+    };
+
+    next.push(player);
+    if (row.isCaptain) {
+      captainByTeam.set(row.teamId, player.id);
+    }
+    nextId += 1;
+  }
+
+  for (const [teamId, captainId] of captainByTeam) {
+    next = applyCaptaincy(next, teamId, captainId);
+  }
+
+  const added = next.length - roster.length;
+  if (added > 0 || captainByTeam.size > 0) {
+    await saveRoster(next);
+    refresh();
+  }
+
+  return { added, skipped };
 }
 
 export async function removePlayerAction(id: number) {

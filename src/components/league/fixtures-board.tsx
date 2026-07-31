@@ -89,16 +89,17 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
                 <MatchStatusBadge status={match.status} />
               </span>
 
-              <Link
-                href={`/teams/${match.homeTeam.id}`}
-                className="flex min-w-0 items-center justify-end gap-2.5 hover:text-[var(--pink)]"
-              >
+              {/* Only the name is a link, so the rest of the row is inert on hover. */}
+              <span className="flex min-w-0 items-center justify-end gap-2.5">
                 {/* leading-tight, not leading-none: truncate clips descenders otherwise */}
-                <span className="truncate text-right text-[14.5px] font-extrabold leading-tight">
+                <Link
+                  href={`/teams/${match.homeTeam.id}`}
+                  className="truncate text-right text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
+                >
                   {match.homeTeam.name}
-                </span>
-                <TeamLogo team={match.homeTeam} size="row" roundedImage={false} />
-              </Link>
+                </Link>
+                <TeamLogo team={match.homeTeam} size="row" shape="bare" />
+              </span>
 
               <span className="justify-self-center rounded-[9px] border border-border px-3.5 py-1.5 font-heading text-sm leading-none tracking-[0.06em] text-muted-foreground">
                 {match.homeScore === null || match.awayScore === null
@@ -106,15 +107,15 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
                   : `${match.homeScore} - ${match.awayScore}`}
               </span>
 
-              <Link
-                href={`/teams/${match.awayTeam.id}`}
-                className="flex min-w-0 items-center gap-2.5 hover:text-[var(--pink)]"
-              >
-                <TeamLogo team={match.awayTeam} size="row" roundedImage={false} />
-                <span className="truncate text-[14.5px] font-extrabold leading-tight">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <TeamLogo team={match.awayTeam} size="row" shape="bare" />
+                <Link
+                  href={`/teams/${match.awayTeam.id}`}
+                  className="truncate text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
+                >
                   {match.awayTeam.name}
-                </span>
-              </Link>
+                </Link>
+              </span>
 
               <span className="col-span-3 justify-self-start empty:hidden md:col-span-1 md:justify-self-end">
                 {match.videoHighlightUrl ? (

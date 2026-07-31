@@ -12,23 +12,30 @@ const sizes = {
   /** Standings and fixtures rows. */
   row: { box: "h-10 w-10", text: "text-[13px]" },
   xl: { box: "h-13 w-13", text: "text-[17px]" },
+  /** Team cards on the Teams tab. */
+  card: { box: "h-14 w-14", text: "text-[19px]" },
   hero: { box: "h-20 w-20", text: "text-[26px]" },
 } as const;
 
-/** "D.A.F" → "DAF", "CHORUS FC" → "CF", "Integration" → "IN". */
-function initials(name: string): string {
-  const words = name.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+/**
+ * - `circle`   — clipped to a circle, the default everywhere.
+ * - `squircle` — rounded square, used by the team cards.
+ * - `bare`     — uploaded artwork shown uncropped; the placeholder stays round.
+ *   Standings and fixtures use this so full logos are not cut off.
+ */
+type Shape = "circle" | "squircle" | "bare";
 
-  if (words.length === 1) {
-    return words[0].slice(0, 2).toUpperCase();
-  }
+const imageRadius: Record<Shape, string> = {
+  circle: "rounded-full",
+  squircle: "rounded-[18px]",
+  bare: "",
+};
 
-  return words
-    .slice(0, 3)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
+const placeholderRadius: Record<Shape, string> = {
+  circle: "rounded-full",
+  squircle: "rounded-[18px]",
+  bare: "rounded-full",
+};
 
 /** Perceived lightness, so pale crests get dark lettering instead of white. */
 function isLight(hex: string): boolean {
@@ -42,18 +49,17 @@ function isLight(hex: string): boolean {
 
 /**
  * Team crest. Uses public/team-logos/<team id>.png when that file exists,
- * otherwise a placeholder in the club colour with the team's initials.
+ * otherwise a placeholder in the club colour with the team's abbreviation.
  */
 export function TeamLogo({
   team,
   size = "md",
-  roundedImage = true,
+  shape = "circle",
   className = "",
 }: {
   team: Team;
   size?: keyof typeof sizes;
-  /** Set false to show the artwork uncropped instead of clipped to a circle. */
-  roundedImage?: boolean;
+  shape?: Shape;
   className?: string;
 }) {
   const logoSrc = useTeamLogoSrc(team.id);
@@ -67,7 +73,7 @@ export function TeamLogo({
         src={logoSrc}
         alt=""
         aria-hidden
-        className={`shrink-0 object-contain ${roundedImage ? "rounded-full" : ""} ${sizes[size].box} ${className}`}
+        className={`shrink-0 object-contain ${imageRadius[shape]} ${sizes[size].box} ${className}`}
       />
     );
   }
@@ -77,14 +83,14 @@ export function TeamLogo({
   return (
     <span
       aria-hidden
-      className={`grid shrink-0 place-items-center rounded-full font-heading leading-none tracking-[0.02em] ${sizes[size].box} ${sizes[size].text} ${className}`}
+      className={`grid shrink-0 place-items-center font-heading leading-none tracking-[0.04em] ${placeholderRadius[shape]} ${sizes[size].box} ${sizes[size].text} ${className}`}
       style={{
         background: team.gradient,
         color: light ? "#1b1420" : "#ffffff",
         boxShadow: `inset 0 0 0 1.5px ${light ? "oklch(0.2 0.04 338 / 0.3)" : "oklch(1 0 0 / 0.45)"}`,
       }}
     >
-      {initials(team.name)}
+      {team.abbr}
     </span>
   );
 }
