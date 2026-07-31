@@ -1,44 +1,53 @@
 import Link from "next/link";
-import { ArrowRight, Users } from "lucide-react";
-import { SectionHeading } from "@/components/league/section-heading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeading } from "@/components/league/page-heading";
+import { TeamLogo } from "@/components/league/team-logo";
+import { getStandingsWithTeams } from "@/data/league";
 import { teams } from "@/data/mock";
 
 export default function TeamsPage() {
+  const table = getStandingsWithTeams();
+  const rankOf = (teamId: number) => table.findIndex((row) => row.teamId === teamId) + 1;
+
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 animate-fade-up">
-      <SectionHeading
-        title="Teams"
-        description="All 6 participating teams in OTSV League."
+    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
+      <PageHeading
+        eyebrow={`${teams.length} departments · OTSV Football League 2026`}
+        title="The"
+        accent="teams"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {teams.map((team) => (
-          <Card key={team.id} className="border-border/70 bg-card/85 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-transform duration-200 hover:-translate-y-0.5 dark:bg-card/70 dark:shadow-none dark:hover:translate-y-0">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-lg">
-                <span>{team.name}</span>
-                <span
-                  className="h-4 w-4 rounded-full"
-                  style={{ backgroundColor: team.colorCode }}
-                />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                Code: {team.shortName}
-              </p>
-              <Link
-                href={`/teams/${team.id}`}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-white dark:bg-background/70 dark:hover:bg-card"
-              >
-                Team Detail
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {teams.map((team) => {
+          const standing = table.find((row) => row.teamId === team.id);
+
+          return (
+            <Link
+              key={team.id}
+              href={`/teams/${team.id}`}
+              className="group overflow-hidden rounded-[20px] border border-border bg-[var(--surface)] shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:border-[var(--border-strong)]"
+            >
+              <span className="block h-24" style={{ background: team.gradient }} />
+              <span className="-mt-8.5 flex flex-col gap-2.5 px-5 pb-5 pt-4.5">
+                <TeamLogo team={team} size="xl" className="border-[3px] border-[var(--bg)]" />
+                <span className="font-heading text-2xl uppercase leading-none">{team.name}</span>
+                <span className="text-[12.5px] font-semibold leading-[1.3] text-muted-foreground">
+                  {team.department} · Position {rankOf(team.id)}
+                </span>
+                <span className="mt-1 flex flex-wrap gap-3.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.12em] text-[var(--faint)]">
+                  <span>P {standing?.played ?? 0}</span>
+                  <span>W {standing?.won ?? 0}</span>
+                  <span>
+                    GD{" "}
+                    {standing && standing.goalDifference > 0
+                      ? `+${standing.goalDifference}`
+                      : (standing?.goalDifference ?? 0)}
+                  </span>
+                  <span>PTS {standing?.points ?? 0}</span>
+                </span>
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

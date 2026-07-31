@@ -1,106 +1,134 @@
-import { Crown, Goal, HandHelping } from "lucide-react";
-import { SectionHeading } from "@/components/league/section-heading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getTeamById, getTopAssists, getTopScorers } from "@/data/league";
+"use client";
+
+import { PageHeading } from "@/components/league/page-heading";
+import { TeamLogo } from "@/components/league/team-logo";
+import { getTeamById, getTopScorers } from "@/data/league";
+import { useCleanSheetTable } from "@/lib/match-store";
+
+const defenceColumns = "grid-cols-[36px_minmax(0,1fr)_44px_52px]";
 
 export default function StatsPage() {
-  const topScorers = getTopScorers(10);
-  const topAssists = getTopAssists(10);
+  const topScorers = getTopScorers(10).filter((player) => player.goals > 0);
+  // Ranked by fewest goals conceded — the meanest defence in the league wins.
+  const defence = useCleanSheetTable();
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 animate-fade-up">
-      <SectionHeading
-        title="Statistics"
-        description="Top scorers (Vua pha luoi) and top assists (Vua kien tao)."
+    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
+      <PageHeading
+        eyebrow={
+          topScorers.length
+            ? `Golden boot race · top ${topScorers.length} scorers`
+            : "Leaderboards unlock after Round 1"
+        }
+        title="Season"
+        accent="stats"
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card className="border-border/70 bg-card/85 shadow-[0_12px_34px_rgba(15,23,42,0.06)] dark:bg-card/75 dark:shadow-none">
-          <CardHeader>
-            <CardTitle className="inline-flex items-center gap-2 font-heading text-xl uppercase tracking-wide">
-              <Goal className="h-5 w-5 text-orange-600 dark:text-orange-300" />
-              Top Scorers
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">#</TableHead>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="hidden sm:table-cell">Team</TableHead>
-                  <TableHead className="text-right">Goals</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topScorers.map((player, index) => {
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        {/* Golden boot */}
+        <div className="flex flex-col gap-4 rounded-[20px] border border-border bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
+          <div className="flex flex-col gap-1.5">
+            <h3 className="m-0 font-heading text-xl uppercase">Golden boot</h3>
+            <span className="text-[12.5px] font-semibold leading-tight text-muted-foreground">
+              Most goals scored this season.
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            {topScorers.length
+              ? topScorers.map((player, index) => {
                   const team = getTeamById(player.teamId);
 
                   return (
-                    <TableRow key={player.id}>
-                      <TableCell className="font-semibold text-muted-foreground">{index + 1}</TableCell>
-                      <TableCell className="max-w-30 truncate font-medium text-foreground sm:max-w-none">{player.name}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{team?.shortName}</TableCell>
-                      <TableCell className="text-right font-bold text-orange-700 dark:text-orange-200">
-                        {index === 0 ? (
-                          <span className="inline-flex items-center gap-1">
-                            <Crown className="h-4 w-4 text-yellow-500 dark:text-yellow-300" />
-                            {player.goals}
-                          </span>
-                        ) : (
-                          player.goals
-                        )}
-                      </TableCell>
-                    </TableRow>
+                    <div
+                      key={player.id}
+                      className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 ${
+                        index === 0
+                          ? "border-[var(--border-strong)] bg-[image:var(--grad-soft)]"
+                          : "border-border bg-[var(--surface-2)]"
+                      }`}
+                    >
+                      <span className="w-4 shrink-0 font-mono text-[10.5px] text-[var(--faint)]">
+                        {index + 1}
+                      </span>
+                      {team ? <TeamLogo team={team} size="sm" /> : null}
+                      <span className="min-w-0 flex-1 truncate text-[13px]">
+                        <span className="font-bold">{player.name}</span>
+                        {team ? (
+                          <span className="font-normal text-muted-foreground"> ({team.name})</span>
+                        ) : null}
+                      </span>
+                      <span className="font-heading text-[18px] leading-none">{player.goals}</span>
+                    </div>
                   );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                })
+              : [1, 2, 3].map((slot) => (
+                  <span
+                    key={slot}
+                    className="flex h-11 items-center rounded-xl border border-dashed border-[var(--border-strong)] px-3.5 font-mono text-[10.5px] font-medium text-[var(--faint)]"
+                  >
+                    {slot} · {slot === 1 ? "awaiting first goal" : ""}
+                  </span>
+                ))}
+          </div>
+        </div>
 
-        <Card className="border-border/70 bg-card/85 shadow-[0_12px_34px_rgba(15,23,42,0.06)] dark:bg-card/75 dark:shadow-none">
-          <CardHeader>
-            <CardTitle className="inline-flex items-center gap-2 font-heading text-xl uppercase tracking-wide">
-              <HandHelping className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />
-              Top Assists
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">#</TableHead>
-                  <TableHead>Player</TableHead>
-                  <TableHead className="hidden sm:table-cell">Team</TableHead>
-                  <TableHead className="text-right">Assists</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topAssists.map((player, index) => {
-                  const team = getTeamById(player.teamId);
+        {/* Best defence */}
+        <div className="flex flex-col gap-4 overflow-hidden rounded-[20px] border border-border bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
+          <div className="flex flex-col gap-1.5">
+            <h3 className="m-0 font-heading text-xl uppercase">Best defence</h3>
+            <span className="text-[12.5px] font-semibold leading-tight text-muted-foreground">
+              Fewest goals conceded in the league.
+            </span>
+          </div>
 
-                  return (
-                    <TableRow key={player.id}>
-                      <TableCell className="font-semibold text-muted-foreground">{index + 1}</TableCell>
-                      <TableCell className="max-w-30 truncate font-medium text-foreground sm:max-w-none">{player.name}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{team?.shortName}</TableCell>
-                      <TableCell className="text-right font-bold text-cyan-700 dark:text-cyan-200">{player.assists}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+          <div className="-mx-1 overflow-x-auto px-1">
+            <div className="min-w-[320px]">
+              <div
+                className={`grid ${defenceColumns} border-b border-border pb-2.5 pl-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--faint)]`}
+              >
+                <span>Pos</span>
+                <span>Team</span>
+                <span className="text-center">P</span>
+                <span className="text-right">GA</span>
+              </div>
+
+              {defence.map((row, index) => (
+                <div
+                  key={row.team.id}
+                  className={`relative grid ${defenceColumns} items-center border-b border-border py-3 pl-3 last:border-b-0 ${
+                    index === 0 ? "bg-[image:var(--grad-soft)]" : ""
+                  }`}
+                >
+                  {index === 0 ? (
+                    <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
+                  ) : null}
+                  <span
+                    className={`font-heading text-[17px] ${index === 0 ? "" : "text-muted-foreground"}`}
+                  >
+                    {index + 1}
+                  </span>
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <TeamLogo team={row.team} size="sm" />
+                    <span className="truncate text-[13px] font-extrabold leading-tight">
+                      {row.team.name}
+                    </span>
+                  </span>
+                  <span className="text-center text-[13px] font-semibold leading-none text-muted-foreground">
+                    {row.played}
+                  </span>
+                  <span className="text-right font-heading text-[17px] leading-none">
+                    {row.goalsAgainst}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="m-0 text-[11.5px] font-semibold leading-[1.4] text-[var(--faint)]">
+            GA = goals against. The team conceding fewest goals wins the title.
+          </p>
+        </div>
       </div>
     </div>
   );

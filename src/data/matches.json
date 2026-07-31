@@ -1,41 +1,21 @@
 [
-  { "id": 1, "homeTeamId": 1, "awayTeamId": 6, "homeScore": 2, "awayScore": 2, "date": "2026-06-03", "time": "19:00", "status": "finished", "matchWeek": 1, "videoHighlightUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-  { "id": 2, "homeTeamId": 2, "awayTeamId": 5, "homeScore": 1, "awayScore": 0, "date": "2026-06-03", "time": "20:30", "status": "finished", "matchWeek": 1, "videoHighlightUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-  { "id": 3, "homeTeamId": 3, "awayTeamId": 4, "homeScore": 3, "awayScore": 1, "date": "2026-06-04", "time": "19:30", "status": "finished", "matchWeek": 1, "videoHighlightUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { "id": 1, "homeTeamId": 1, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-17", "time": "18:30", "status": "upcoming", "round": 1, "videoHighlightUrl": "" },
+  { "id": 2, "homeTeamId": 2, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-08-17", "time": "19:30", "status": "upcoming", "round": 1, "videoHighlightUrl": "" },
+  { "id": 3, "homeTeamId": 3, "awayTeamId": 4, "homeScore": null, "awayScore": null, "date": "2026-08-17", "time": "19:30", "status": "upcoming", "round": 1, "videoHighlightUrl": "" },
 
-  { "id": 4, "homeTeamId": 5, "awayTeamId": 1, "homeScore": 1, "awayScore": 2, "date": "2026-06-10", "time": "19:00", "status": "finished", "matchWeek": 2, "videoHighlightUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-  { "id": 5, "homeTeamId": 4, "awayTeamId": 6, "homeScore": 2, "awayScore": 3, "date": "2026-06-10", "time": "20:30", "status": "finished", "matchWeek": 2, "videoHighlightUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-  { "id": 6, "homeTeamId": 3, "awayTeamId": 2, "homeScore": 2, "awayScore": 2, "date": "2026-06-11", "time": "19:30", "status": "finished", "matchWeek": 2, "videoHighlightUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { "id": 4, "homeTeamId": 1, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-08-20", "time": "18:30", "status": "upcoming", "round": 2, "videoHighlightUrl": "" },
+  { "id": 5, "homeTeamId": 6, "awayTeamId": 4, "homeScore": null, "awayScore": null, "date": "2026-08-20", "time": "19:30", "status": "upcoming", "round": 2, "videoHighlightUrl": "" },
+  { "id": 6, "homeTeamId": 2, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-08-20", "time": "19:30", "status": "upcoming", "round": 2, "videoHighlightUrl": "" },
 
-  { "id": 7, "homeTeamId": 1, "awayTeamId": 4, "homeScore": 3, "awayScore": 1, "date": "2026-06-17", "time": "19:00", "status": "finished", "matchWeek": 3, "videoHighlightUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-  { "id": 8, "homeTeamId": 5, "awayTeamId": 3, "homeScore": 0, "awayScore": 2, "date": "2026-06-17", "time": "20:30", "status": "finished", "matchWeek": 3, "videoHighlightUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-  { "id": 9, "homeTeamId": 6, "awayTeamId": 2, "homeScore": 1, "awayScore": 1, "date": "2026-06-18", "time": "19:30", "status": "finished", "matchWeek": 3, "videoHighlightUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { "id": 7, "homeTeamId": 1, "awayTeamId": 4, "homeScore": null, "awayScore": null, "date": "2026-08-24", "time": "18:30", "status": "upcoming", "round": 3, "videoHighlightUrl": "" },
+  { "id": 8, "homeTeamId": 5, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-08-24", "time": "19:30", "status": "upcoming", "round": 3, "videoHighlightUrl": "" },
+  { "id": 9, "homeTeamId": 6, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-24", "time": "19:30", "status": "upcoming", "round": 3, "videoHighlightUrl": "" },
 
-  { "id": 10, "homeTeamId": 1, "awayTeamId": 3, "homeScore": 1, "awayScore": 0, "date": "2026-06-24", "time": "19:00", "status": "finished", "matchWeek": 4, "videoHighlightUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-  { "id": 11, "homeTeamId": 2, "awayTeamId": 4, "homeScore": 2, "awayScore": 1, "date": "2026-06-24", "time": "20:30", "status": "finished", "matchWeek": 4, "videoHighlightUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-  { "id": 12, "homeTeamId": 6, "awayTeamId": 5, "homeScore": 3, "awayScore": 2, "date": "2026-06-25", "time": "19:30", "status": "finished", "matchWeek": 4, "videoHighlightUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
+  { "id": 10, "homeTeamId": 1, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "18:30", "status": "upcoming", "round": 4, "videoHighlightUrl": "" },
+  { "id": 11, "homeTeamId": 4, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "19:30", "status": "upcoming", "round": 4, "videoHighlightUrl": "" },
+  { "id": 12, "homeTeamId": 5, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "19:30", "status": "upcoming", "round": 4, "videoHighlightUrl": "" },
 
-  { "id": 13, "homeTeamId": 2, "awayTeamId": 1, "homeScore": 1, "awayScore": 2, "date": "2026-07-01", "time": "19:00", "status": "finished", "matchWeek": 5, "videoHighlightUrl": "https://www.youtube.com/watch?v=ScMzIvxBSi4" },
-  { "id": 14, "homeTeamId": 3, "awayTeamId": 6, "homeScore": 2, "awayScore": 2, "date": "2026-07-01", "time": "20:30", "status": "finished", "matchWeek": 5, "videoHighlightUrl": "https://www.youtube.com/watch?v=aqz-KE-bpKQ" },
-  { "id": 15, "homeTeamId": 4, "awayTeamId": 5, "homeScore": 1, "awayScore": 1, "date": "2026-07-02", "time": "19:30", "status": "finished", "matchWeek": 5, "videoHighlightUrl": "https://www.youtube.com/watch?v=jNQXAC9IVRw" },
-
-  { "id": 16, "homeTeamId": 6, "awayTeamId": 1, "homeScore": null, "awayScore": null, "date": "2026-07-08", "time": "19:00", "status": "upcoming", "matchWeek": 6, "videoHighlightUrl": "" },
-  { "id": 17, "homeTeamId": 5, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-07-08", "time": "20:30", "status": "upcoming", "matchWeek": 6, "videoHighlightUrl": "" },
-  { "id": 18, "homeTeamId": 4, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-07-09", "time": "19:30", "status": "upcoming", "matchWeek": 6, "videoHighlightUrl": "" },
-
-  { "id": 19, "homeTeamId": 1, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-07-15", "time": "19:00", "status": "upcoming", "matchWeek": 7, "videoHighlightUrl": "" },
-  { "id": 20, "homeTeamId": 6, "awayTeamId": 4, "homeScore": null, "awayScore": null, "date": "2026-07-15", "time": "20:30", "status": "upcoming", "matchWeek": 7, "videoHighlightUrl": "" },
-  { "id": 21, "homeTeamId": 2, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-07-16", "time": "19:30", "status": "upcoming", "matchWeek": 7, "videoHighlightUrl": "" },
-
-  { "id": 22, "homeTeamId": 4, "awayTeamId": 1, "homeScore": null, "awayScore": null, "date": "2026-07-22", "time": "19:00", "status": "upcoming", "matchWeek": 8, "videoHighlightUrl": "" },
-  { "id": 23, "homeTeamId": 3, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-07-22", "time": "20:30", "status": "upcoming", "matchWeek": 8, "videoHighlightUrl": "" },
-  { "id": 24, "homeTeamId": 2, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-07-23", "time": "19:30", "status": "upcoming", "matchWeek": 8, "videoHighlightUrl": "" },
-
-  { "id": 25, "homeTeamId": 3, "awayTeamId": 1, "homeScore": null, "awayScore": null, "date": "2026-07-29", "time": "19:00", "status": "upcoming", "matchWeek": 9, "videoHighlightUrl": "" },
-  { "id": 26, "homeTeamId": 4, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-07-29", "time": "20:30", "status": "upcoming", "matchWeek": 9, "videoHighlightUrl": "" },
-  { "id": 27, "homeTeamId": 5, "awayTeamId": 6, "homeScore": 1, "awayScore": 2, "date": "2026-07-30", "time": "19:30", "status": "live", "matchWeek": 9, "videoHighlightUrl": "" },
-
-  { "id": 28, "homeTeamId": 1, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-05", "time": "19:00", "status": "upcoming", "matchWeek": 10, "videoHighlightUrl": "" },
-  { "id": 29, "homeTeamId": 6, "awayTeamId": 3, "homeScore": null, "awayScore": null, "date": "2026-08-05", "time": "20:30", "status": "upcoming", "matchWeek": 10, "videoHighlightUrl": "" },
-  { "id": 30, "homeTeamId": 5, "awayTeamId": 4, "homeScore": null, "awayScore": null, "date": "2026-08-06", "time": "19:30", "status": "upcoming", "matchWeek": 10, "videoHighlightUrl": "" }
+  { "id": 13, "homeTeamId": 1, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-29", "time": "15:30", "status": "upcoming", "round": 5, "videoHighlightUrl": "" },
+  { "id": 14, "homeTeamId": 3, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-29", "time": "15:30", "status": "upcoming", "round": 5, "videoHighlightUrl": "" },
+  { "id": 15, "homeTeamId": 4, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-08-29", "time": "16:30", "status": "upcoming", "round": 5, "videoHighlightUrl": "" }
 ]

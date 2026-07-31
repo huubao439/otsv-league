@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 
+/** Card / section header: Anton title with a supporting line beneath it. */
 export function SectionHeading({
   title,
   description,
@@ -10,14 +11,18 @@ export function SectionHeading({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h2 className="font-heading text-xl font-bold uppercase tracking-wide text-slate-900 sm:text-3xl dark:text-foreground">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="m-0 font-heading text-[23px] uppercase leading-none tracking-[0.01em] sm:text-[27px]">
           {title}
         </h2>
-        {description ? <p className="mt-1 text-sm text-slate-600 dark:text-muted-foreground">{description}</p> : null}
+        {description ? (
+          <span className="text-[12.5px] font-semibold leading-tight text-muted-foreground">
+            {description}
+          </span>
+        ) : null}
       </div>
-      {action ? <div className="w-full sm:w-auto">{action}</div> : null}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }

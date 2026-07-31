@@ -1,8 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 type ThemeMode = "dark" | "light";
 
@@ -32,16 +30,16 @@ export function ThemeToggle() {
   const nextTheme: ThemeMode = theme === "dark" ? "light" : "dark";
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-9 w-9"
+    <button
+      type="button"
+      title="Toggle light / dark"
       aria-label={`Switch to ${nextTheme} mode`}
+      className="grid h-10 w-10 place-items-center rounded-full border border-border bg-[var(--surface)] text-base text-foreground transition-colors hover:border-[var(--border-strong)] hover:bg-[image:var(--grad-soft)]"
       onClick={() => {
         setTheme(nextTheme);
       }}
     >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </Button>
+      {theme === "dark" ? "☀" : "☾"}
+    </button>
   );
 }

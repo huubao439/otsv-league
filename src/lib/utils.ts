@@ -9,13 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 export function siteMetadata(partial?: Partial<Metadata>): Metadata {
   const base: Metadata = {
     title: {
-      default: "OTSV League",
-      template: "%s | OTSV League",
+      default: "OTSV FOOTBALL LEAGUE 2026",
+      template: "%s | OTSV FOOTBALL LEAGUE 2026",
     },
-    description: "Giải bóng đá công ty OTSV - Nơi giao lưu, gắn kết và thi đấu.",
-    icons: {
-      icon: "/favicon.ico",
-    },
+    description: "Giải bóng đá công ty OTSV 2026 - Nơi giao lưu, gắn kết và thi đấu.",
   };
   return { ...base, ...partial };
 }

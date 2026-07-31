@@ -23,12 +23,15 @@ export function generatePlayers(teams: Team[]): Player[] {
       const count = pos === "GK" ? 2 : pos === "DF" ? 5 : pos === "MF" ? 5 : 3;
       for (let i = 0; i < count; i++) {
         const name = surnames[Math.floor(Math.random() * surnames.length)] + " " + givenNames[Math.floor(Math.random() * givenNames.length)];
+        const shirtNumber = shirt++;
         players.push({
           id: uid++,
           teamId: team.id,
           name,
-          shirtNumber: shirt++,
+          jerseyName: name.split(" ").at(-1)!.toUpperCase(),
+          shirtNumber,
           position: pos,
+          isCaptain: shirtNumber === 1,
           goals: rand(0, 12),
           assists: rand(0, 8),
           yellowCards: rand(0, 4),
@@ -74,7 +77,7 @@ export function generateMatches(teams: Team[]): Match[] {
         date: mws[wk].date,
         time: mws[wk].time,
         status,
-        matchWeek: wk + 1,
+        round: wk + 1,
         videoHighlightUrl: status === "finished" ? "https://www.youtube.com/embed/dQw4w9WgXcQ" : undefined,
       });
     }

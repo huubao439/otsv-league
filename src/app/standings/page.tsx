@@ -1,105 +1,161 @@
-import { Trophy } from "lucide-react";
-import { SectionHeading } from "@/components/league/section-heading";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getStandingsWithTeams } from "@/data/league";
+"use client";
+
+import Link from "next/link";
+import { FormGuide } from "@/components/league/form-guide";
+import { PageHeading } from "@/components/league/page-heading";
+import { TeamLogo } from "@/components/league/team-logo";
+import { ROUNDS, teamFormFrom } from "@/data/league";
+import { useMatches, useSeasonProgress, useStandings } from "@/lib/match-store";
+
+const columns =
+  "grid-cols-[48px_minmax(0,1fr)_42px_42px_42px_42px_46px_46px_52px_96px_58px] min-w-[770px]";
 
 export default function StandingsPage() {
-  const rows = getStandingsWithTeams();
+  const rows = useStandings();
+  const progress = useSeasonProgress();
+  const allMatches = useMatches();
+  const roundsPlayed = Math.floor(progress.played / (progress.total / ROUNDS.length));
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 animate-fade-up">
-      <SectionHeading
-        title="Standings"
-        description="Full league table with 6 teams in a double round-robin season."
+    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
+      <PageHeading
+        eyebrow={`Season 2026 · after ${roundsPlayed} of ${ROUNDS.length} rounds`}
+        title="League"
+        accent="standings"
+        aside={
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full bg-[image:var(--grad)] px-4 py-2.5 text-[12.5px] font-bold leading-none text-white">
+              Overall
+            </span>
+            <span className="rounded-full border border-border px-4 py-2.5 text-[12.5px] font-semibold leading-none text-[var(--faint)]">
+              {progress.played} played
+            </span>
+            <span className="rounded-full border border-border px-4 py-2.5 text-[12.5px] font-semibold leading-none text-[var(--faint)]">
+              {progress.total - progress.played} to play
+            </span>
+          </div>
+        }
       />
 
-      <div className="space-y-3 md:hidden">
-        {rows.map((row, index) => {
-          const champion = index === 0;
+      <div className="grid items-start gap-5 xl:grid-cols-[1.55fr_0.75fr]">
+        <div className="overflow-hidden overflow-x-auto rounded-[22px] border border-border bg-[var(--surface)] shadow-[var(--shadow-soft)]">
+          <div
+            className={`grid ${columns} border-b border-border bg-[var(--surface-2)] px-6 py-3.5 font-mono text-[10.5px] font-medium uppercase leading-none tracking-[0.12em] text-[var(--faint)]`}
+          >
+            <span>Pos</span>
+            <span>Team</span>
+            <span className="text-center">P</span>
+            <span className="text-center">W</span>
+            <span className="text-center">D</span>
+            <span className="text-center">L</span>
+            <span className="text-center">GF</span>
+            <span className="text-center">GA</span>
+            <span className="text-center">GD</span>
+            <span className="text-center">Form</span>
+            <span className="text-right">Pts</span>
+          </div>
 
-          return (
-            <Card key={row.teamId} className={`border-border/70 bg-card/90 dark:bg-card/75 ${champion ? "ring-1 ring-emerald-500/40" : ""}`}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Pos #{index + 1}</p>
-                    <p className="mt-1 inline-flex items-center gap-2 font-semibold text-foreground">
-                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: row.team.colorCode }} />
-                      <span className="truncate">{row.team.name}</span>
-                      {champion ? <Trophy className="h-4 w-4 text-emerald-600 dark:text-lime-400" /> : null}
-                    </p>
-                  </div>
-                  <p className="rounded-md bg-emerald-500/10 px-2 py-1 text-sm font-bold text-emerald-700 dark:text-lime-300">{row.points} pts</p>
+          {rows.map((row, index) => {
+            const leader = index === 0;
+
+            return (
+              <div
+                key={row.teamId}
+                className={`relative grid ${columns} items-center border-b border-border px-6 py-4 transition-colors last:border-b-0 hover:bg-[var(--surface-2)] ${
+                  leader ? "bg-[image:var(--grad-soft)]" : ""
+                }`}
+              >
+                {leader ? (
+                  <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
+                ) : null}
+                <span className={`font-heading text-[19px] ${leader ? "" : "text-muted-foreground"}`}>
+                  {index + 1}
+                </span>
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <TeamLogo team={row.team} size="row" roundedImage={false} />
+                  <Link
+                    href={`/teams/${row.teamId}`}
+                    className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
+                  >
+                    {row.team.name}
+                  </Link>
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.played}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.won}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.drawn}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.lost}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.goalsFor}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.goalsAgainst}
+                </span>
+                <span className="text-center text-[13.5px] font-semibold leading-none text-muted-foreground">
+                  {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+                </span>
+                <FormGuide form={teamFormFrom(allMatches, row.teamId)} />
+                <span className="text-right font-heading text-[21px]">{row.points}</span>
+              </div>
+            );
+          })}
+
+          <div className="flex flex-wrap items-center gap-4.5 bg-[var(--surface-2)] px-6 py-3.5 text-[11.5px] font-semibold leading-none text-[var(--faint)]">
+            <span className="flex items-center gap-1.5">
+              <span className="h-[3px] w-3 rounded-sm bg-[image:var(--grad)]" />
+              Championship place
+            </span>
+            <span className="ml-auto font-mono tracking-[0.1em]">
+              Sorted by points, then goal difference
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3.5 rounded-[20px] border border-border bg-[var(--surface)] p-5.5">
+            <h3 className="m-0 font-heading text-[19px] uppercase">Points</h3>
+            <div className="flex flex-col gap-2.5">
+              {[
+                ["Win", "3"],
+                ["Draw", "1"],
+                ["Loss", "0"],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between text-[13px] font-semibold leading-none text-muted-foreground"
+                >
+                  <span>{label}</span>
+                  <span className="font-heading text-[18px] text-foreground">{value}</span>
                 </div>
-                <div className="mt-3 grid grid-cols-4 gap-2 text-center text-xs">
-                  <p className="rounded-md bg-background/70 p-2">P<br /><span className="font-semibold text-sm">{row.played}</span></p>
-                  <p className="rounded-md bg-background/70 p-2">W<br /><span className="font-semibold text-sm">{row.won}</span></p>
-                  <p className="rounded-md bg-background/70 p-2">D<br /><span className="font-semibold text-sm">{row.drawn}</span></p>
-                  <p className="rounded-md bg-background/70 p-2">L<br /><span className="font-semibold text-sm">{row.lost}</span></p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-[image:var(--grad-soft)] p-5.5">
+            <h3 className="m-0 font-heading text-[19px] uppercase">Tiebreakers</h3>
+            <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-4.5 text-[12.5px] font-semibold leading-[1.4] text-muted-foreground">
+              <li>Goal difference</li>
+              <li>Goals scored</li>
+              <li>Head-to-head result</li>
+              <li>Penalty shootout</li>
+            </ol>
+          </div>
+
+          <Link
+            href="/fixtures"
+            className="rounded-2xl border border-border bg-[var(--surface)] p-3.5 text-center text-[13px] font-bold leading-none text-foreground transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)]"
+          >
+            View full fixture list →
+          </Link>
+        </div>
       </div>
-
-      <Card className="hidden border-border/70 bg-card/85 shadow-[0_12px_36px_rgba(15,23,42,0.06)] dark:bg-card/75 dark:shadow-none md:block">
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10">Pos</TableHead>
-                <TableHead>Team</TableHead>
-                <TableHead className="text-center">P</TableHead>
-                <TableHead className="text-center">W</TableHead>
-                <TableHead className="text-center">D</TableHead>
-                <TableHead className="text-center">L</TableHead>
-                <TableHead className="text-center">GF</TableHead>
-                <TableHead className="text-center">GA</TableHead>
-                <TableHead className="text-center">GD</TableHead>
-                <TableHead className="text-right">Pts</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row, index) => {
-                const champion = index === 0;
-
-                return (
-                  <TableRow key={row.teamId} className={champion ? "bg-emerald-500/10 dark:bg-lime-400/10" : undefined}>
-                    <TableCell className="font-semibold text-muted-foreground">{index + 1}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: row.team.colorCode }}
-                        />
-                        <span className="font-medium text-foreground">{row.team.name}</span>
-                        {champion ? <Trophy className="h-4 w-4 text-emerald-600 dark:text-lime-400" /> : null}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">{row.played}</TableCell>
-                    <TableCell className="text-center">{row.won}</TableCell>
-                    <TableCell className="text-center">{row.drawn}</TableCell>
-                    <TableCell className="text-center">{row.lost}</TableCell>
-                    <TableCell className="text-center">{row.goalsFor}</TableCell>
-                    <TableCell className="text-center">{row.goalsAgainst}</TableCell>
-                    <TableCell className="text-center">{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</TableCell>
-                    <TableCell className="text-right font-bold text-emerald-700 dark:text-lime-300">{row.points}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 }
