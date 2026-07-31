@@ -20,8 +20,6 @@ import { getMatches } from "@/lib/server/league-data";
 const tableColumns =
   "grid-cols-[44px_minmax(0,1fr)_40px_40px_40px_40px_52px_92px_52px] min-w-[660px]";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const allMatches = await getMatches();
   const table = standingsWithTeamsFrom(allMatches);

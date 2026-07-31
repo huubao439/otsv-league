@@ -14,6 +14,14 @@ import { dirname, join } from "node:path";
 const REST_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
 const REST_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
+/**
+ * Cache tag for every league read. Reads are cached so pages stay static and
+ * prefetchable; admin writes call revalidateTag(LEAGUE_TAG) to push the change
+ * to everyone. Without this the reads would force dynamic rendering and kill
+ * link prefetching, which makes tab switching feel slow.
+ */
+export const LEAGUE_TAG = "otsv-league-data";
+
 export const usingRedis = Boolean(REST_URL && REST_TOKEN);
 
 const LOCAL_FILE = join(process.cwd(), ".data", "store.json");
@@ -39,7 +47,8 @@ export async function kvGet<T>(key: string): Promise<T | null> {
 
   const response = await fetch(`${REST_URL}/get/${encodeURIComponent(key)}`, {
     headers: { Authorization: `Bearer ${REST_TOKEN}` },
-    cache: "no-store",
+    // Cached and tagged rather than no-store, so the page can stay static.
+    next: { tags: [LEAGUE_TAG] },
   });
 
   if (!response.ok) {

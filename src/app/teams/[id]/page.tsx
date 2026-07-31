@@ -12,9 +12,13 @@ import {
   teamFormFrom,
   withTeams,
 } from "@/data/league";
+import { teams } from "@/data/mock";
 import { getMatches, getRoster } from "@/lib/server/league-data";
 
-export const dynamic = "force-dynamic";
+/** Prerender all six team pages so they are prefetchable like the rest. */
+export function generateStaticParams() {
+  return teams.map((team) => ({ id: String(team.id) }));
+}
 
 export default async function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

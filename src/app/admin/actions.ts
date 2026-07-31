@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { LEAGUE_TAG } from "@/lib/server/kv";
 import { getMatches, getRoster, saveMatches, saveRoster } from "@/lib/server/league-data";
 import { type MatchEvent, type Player, type PlayerDraft } from "@/lib/types";
 
@@ -12,6 +13,11 @@ import { type MatchEvent, type Player, type PlayerDraft } from "@/lib/types";
  * testing. Gate them before this is public; see src/lib/admin-auth.ts.
  */
 function refresh() {
+  // updateTag (not revalidateTag) expires the cached read immediately rather
+  // than serving stale-while-revalidate, so the admin sees their own save and
+  // the next visitor gets fresh data straight away. revalidatePath then drops
+  // the rendered pages built from that read.
+  updateTag(LEAGUE_TAG);
   revalidatePath("/", "layout");
 }
 

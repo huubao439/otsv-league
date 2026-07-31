@@ -1,75 +1,41 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { ADMIN_COOKIE, getAdminCredentials, isValidSessionToken } from "@/lib/admin-session";
 
-const AUTH_REALM = "OTSV Admin";
-const ADMIN_PAGE_PATHS = new Set(["/admin", "/admin/"]);
+const LOGIN_PATH = "/admin/login";
 
-type BasicCredentials = {
-  username: string;
-  password: string;
-};
+/**
+ * Guards the admin area with a signed session cookie.
+ *
+ * This replaced HTTP Basic Auth: browsers cache basic credentials for the realm
+ * and re-send them automatically, so there is no reliable way to log out. The
+ * login page itself is exempt, otherwise redirecting to it would loop.
+ */
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-function unauthorizedResponse(message = "Authentication required") {
-  return new NextResponse(message, {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": `Basic realm=\"${AUTH_REALM}\", charset=\"UTF-8\"`,
-    },
-  });
-}
-
-function parseBasicCredentials(headerValue: string | null): BasicCredentials | null {
-  if (!headerValue?.startsWith("Basic ")) {
-    return null;
-  }
-
-  const encoded = headerValue.slice(6).trim();
-  if (!encoded) {
-    return null;
-  }
-
-  let decoded = "";
-  try {
-    decoded = atob(encoded);
-  } catch {
-    return null;
-  }
-
-  const separatorIndex = decoded.indexOf(":");
-  if (separatorIndex === -1) {
-    return null;
-  }
-
-  return {
-    username: decoded.slice(0, separatorIndex),
-    password: decoded.slice(separatorIndex + 1),
-  };
-}
-
-export function proxy(request: NextRequest) {
-  if (!ADMIN_PAGE_PATHS.has(request.nextUrl.pathname)) {
+  if (pathname === LOGIN_PATH || pathname === `${LOGIN_PATH}/`) {
     return NextResponse.next();
   }
 
-  const expectedUsername = process.env.ADMIN_BASIC_AUTH_USERNAME;
-  const expectedPassword = process.env.ADMIN_BASIC_AUTH_PASSWORD;
-
-  if (!expectedUsername || !expectedPassword) {
-    return new NextResponse("Admin basic auth is not configured on the server.", {
-      status: 500,
-    });
+  const credentials = getAdminCredentials();
+  if (!credentials) {
+    return new NextResponse(
+      "Admin auth is not configured: set ADMIN_BASIC_AUTH_USERNAME and ADMIN_BASIC_AUTH_PASSWORD.",
+      { status: 500 },
+    );
   }
 
-  const credentials = parseBasicCredentials(request.headers.get("authorization"));
-  const isValid =
-    credentials?.username === expectedUsername &&
-    credentials?.password === expectedPassword;
-
-  if (!isValid) {
-    return unauthorizedResponse();
+  const token = request.cookies.get(ADMIN_COOKIE)?.value;
+  if (await isValidSessionToken(token, credentials)) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const loginUrl = new URL(LOGIN_PATH, request.url);
+  // Send the visitor back where they were headed once signed in.
+  loginUrl.searchParams.set("from", pathname);
+
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {

@@ -5,8 +5,6 @@ import { standingsWithTeamsFrom } from "@/data/league";
 import { teams } from "@/data/mock";
 import { getMatches } from "@/lib/server/league-data";
 
-export const dynamic = "force-dynamic";
-
 export default async function TeamsPage() {
   const table = standingsWithTeamsFrom(await getMatches());
   const rankOf = (teamId: number) => table.findIndex((row) => row.teamId === teamId) + 1;

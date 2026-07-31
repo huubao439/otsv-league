@@ -5,8 +5,6 @@ import { getMatches, getRoster } from "@/lib/server/league-data";
 
 const defenceColumns = "grid-cols-[36px_minmax(0,1fr)_44px_52px]";
 
-export const dynamic = "force-dynamic";
-
 export default async function StatsPage() {
   const roster = await getRoster();
   const topScorers = [...roster]
