@@ -4,6 +4,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { TeamLogo } from "@/components/league/team-logo";
 import { saveMatchAction } from "@/app/admin/actions";
+import { MatchImage } from "@/components/admin/match-image";
 import { type FixtureRound } from "@/components/league/fixtures-board";
 import { formatKickoff, type MatchWithTeams } from "@/data/league";
 import { type MatchEvent, type Player, type Team } from "@/lib/types";
@@ -406,12 +407,14 @@ function RoundBlock({
   round,
   matches,
   roster,
+  imageIds,
   editingId,
   onEdit,
 }: {
   round: number;
   matches: MatchWithTeams[];
   roster: Player[];
+  imageIds: Set<number>;
   editingId: number | null;
   onEdit: (id: number | null) => void;
 }) {
@@ -426,37 +429,44 @@ function RoundBlock({
 
       {matches.map((match) => (
         <div key={match.id} className="border-b border-border last:border-b-0">
-          <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-5">
-            <span className="w-32 shrink-0 font-mono text-[10.5px] leading-none tracking-[0.1em] text-[var(--faint)]">
+          {/* Mobile: date on its own line, teams full-width so names never clip.
+              Desktop (sm+): single inline row, unchanged. */}
+          <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-5">
+            <span className="shrink-0 font-mono text-[10.5px] leading-none tracking-[0.1em] text-[var(--faint)] sm:w-32">
               {formatKickoff(match.date, match.time)}
             </span>
-            <span className="flex min-w-0 flex-1 items-center justify-end gap-2.5">
-              <span className="truncate text-right text-[13px] font-extrabold leading-tight">
-                {match.homeTeam.name}
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:flex sm:flex-1 sm:gap-3">
+              <span className="flex min-w-0 items-center justify-end gap-2.5 sm:flex-1">
+                <span className="truncate text-right text-[13px] font-extrabold leading-tight">
+                  {match.homeTeam.name}
+                </span>
+                <TeamLogo team={match.homeTeam} size="sm" />
               </span>
-              <TeamLogo team={match.homeTeam} size="sm" />
-            </span>
-            <span className="shrink-0 rounded-lg border border-border px-3 py-1.5 font-heading text-sm leading-none">
-              {match.homeScore === null || match.awayScore === null
-                ? "VS"
-                : `${match.homeScore} - ${match.awayScore}`}
-            </span>
-            <span className="flex min-w-0 flex-1 items-center gap-2.5">
-              <TeamLogo team={match.awayTeam} size="sm" />
-              <span className="truncate text-[13px] font-extrabold leading-tight">
-                {match.awayTeam.name}
+              <span className="shrink-0 justify-self-center rounded-lg border border-border px-3 py-1.5 font-heading text-sm leading-none">
+                {match.homeScore === null || match.awayScore === null
+                  ? "VS"
+                  : `${match.homeScore} - ${match.awayScore}`}
               </span>
+              <span className="flex min-w-0 items-center gap-2.5 sm:flex-1">
+                <TeamLogo team={match.awayTeam} size="sm" />
+                <span className="truncate text-[13px] font-extrabold leading-tight">
+                  {match.awayTeam.name}
+                </span>
+              </span>
+            </div>
+            <span className="flex flex-wrap items-center gap-2 sm:ml-auto sm:shrink-0">
+              <MatchImage matchId={match.id} hasImage={imageIds.has(match.id)} />
+              <button
+                type="button"
+                onClick={() => onEdit(editingId === match.id ? null : match.id)}
+                aria-expanded={editingId === match.id}
+                data-testid={`admin-edit-match-${match.id}`}
+                className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-[12px] font-bold leading-none text-muted-foreground transition-colors hover:border-[var(--border-strong)] hover:text-foreground"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit
+              </button>
             </span>
-            <button
-              type="button"
-              onClick={() => onEdit(editingId === match.id ? null : match.id)}
-              aria-expanded={editingId === match.id}
-              data-testid={`admin-edit-match-${match.id}`}
-              className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-[12px] font-bold leading-none text-muted-foreground transition-colors hover:border-[var(--border-strong)] hover:text-foreground"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Edit
-            </button>
           </div>
 
           {editingId === match.id ? (
@@ -468,8 +478,17 @@ function RoundBlock({
   );
 }
 
-export function MatchDetail({ rounds, roster }: { rounds: FixtureRound[]; roster: Player[] }) {
+export function MatchDetail({
+  rounds,
+  roster,
+  matchImageIds,
+}: {
+  rounds: FixtureRound[];
+  roster: Player[];
+  matchImageIds: number[];
+}) {
   const [editingId, setEditingId] = useState<number | null>(null);
+  const imageIds = new Set(matchImageIds);
 
   return (
     <div className="flex flex-col gap-3">
@@ -479,6 +498,7 @@ export function MatchDetail({ rounds, roster }: { rounds: FixtureRound[]; roster
           round={round}
           matches={matches}
           roster={roster}
+          imageIds={imageIds}
           editingId={editingId}
           onEdit={setEditingId}
         />

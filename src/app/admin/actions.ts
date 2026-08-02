@@ -3,7 +3,15 @@
 import { revalidatePath, updateTag } from "next/cache";
 import { teams } from "@/data/mock";
 import { LEAGUE_TAG } from "@/lib/server/kv";
-import { getMatches, getRoster, saveMatches, saveRoster } from "@/lib/server/league-data";
+import {
+  deleteMatchImage,
+  getMatchImage,
+  getMatches,
+  getRoster,
+  saveMatchImage,
+  saveMatches,
+  saveRoster,
+} from "@/lib/server/league-data";
 import {
   type MatchEvent,
   type Player,
@@ -163,6 +171,37 @@ export type MatchResultDraft = {
   videoHighlightUrl: string;
   events: MatchEvent[];
 };
+
+/** Upper bound on the stored data URL, to stay well under the KV request cap. */
+const MAX_IMAGE_CHARS = 1_400_000;
+
+export type ImageSaveResult = { ok: boolean; error?: string };
+
+export async function saveMatchImageAction(
+  matchId: number,
+  dataUrl: string,
+): Promise<ImageSaveResult> {
+  if (!dataUrl.startsWith("data:image/")) {
+    return { ok: false, error: "That is not an image." };
+  }
+  if (dataUrl.length > MAX_IMAGE_CHARS) {
+    return { ok: false, error: "Image is too large even after compression." };
+  }
+
+  await saveMatchImage(matchId, dataUrl);
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteMatchImageAction(matchId: number) {
+  await deleteMatchImage(matchId);
+  refresh();
+}
+
+/** Returns the stored data URL for on-demand viewing (nothing is sent until asked). */
+export async function getMatchImageAction(matchId: number): Promise<string | null> {
+  return getMatchImage(matchId);
+}
 
 export async function saveMatchAction(matchId: number, draft: MatchResultDraft) {
   const matches = await getMatches();

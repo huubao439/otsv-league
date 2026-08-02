@@ -43,7 +43,8 @@ export default async function StandingsPage() {
       />
 
       <div className="grid items-start gap-5 xl:grid-cols-[1.55fr_0.75fr]">
-        <div className="overflow-hidden overflow-x-auto rounded-[22px] border border-border bg-[var(--surface)] shadow-[var(--shadow-soft)]">
+        {/* Desktop table — hidden on mobile, where the row-cards below take over. */}
+        <div className="hidden overflow-hidden overflow-x-auto rounded-[22px] border border-border bg-[var(--surface)] shadow-[var(--shadow-soft)] md:block">
           <div
             className={`grid ${columns} border-b border-border bg-[var(--surface-2)] px-6 py-3.5 font-mono text-[10.5px] font-medium uppercase leading-none tracking-[0.12em] text-[var(--faint)]`}
           >
@@ -122,6 +123,63 @@ export default async function StandingsPage() {
             <span className="ml-auto font-mono tracking-[0.1em]">
               Sorted by points, then goal difference
             </span>
+          </div>
+        </div>
+
+        {/* Mobile reflow — the wide table becomes row-cards so nothing scrolls sideways. */}
+        <div className="flex flex-col gap-2 md:hidden">
+          {rows.map((row, index) => {
+            const leader = index === 0;
+            const gd =
+              row.goalDifference > 0 ? `+${row.goalDifference}` : String(row.goalDifference);
+
+            return (
+              <div
+                key={row.teamId}
+                className={`relative flex items-center gap-3 overflow-hidden rounded-[18px] border border-border p-3 ${
+                  leader ? "bg-[image:var(--grad-gold-soft)]" : "bg-[var(--surface)]"
+                }`}
+              >
+                <span
+                  aria-hidden
+                  className={`absolute bottom-0 left-0 top-0 w-[3px] ${
+                    leader ? "bg-[image:var(--grad-gold)]" : ""
+                  }`}
+                  style={leader ? undefined : { background: row.team.gradient }}
+                />
+                <span
+                  className={`w-4 shrink-0 pl-0.5 font-heading text-[19px] leading-none ${
+                    leader ? "text-[var(--gold)]" : "text-muted-foreground"
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <TeamLogo team={row.team} size="row" shape="squircle" />
+                <span className="flex min-w-0 flex-1 flex-col gap-1">
+                  <Link
+                    href={`/teams/${row.teamId}`}
+                    className="truncate text-[14px] font-extrabold leading-tight text-foreground"
+                  >
+                    {row.team.name}
+                  </Link>
+                  <span className="truncate font-mono text-[9.5px] leading-none tracking-[0.06em] text-[var(--faint)]">
+                    P {row.played} · W {row.won} · D {row.drawn} · L {row.lost} · GD {gd}
+                  </span>
+                </span>
+                <span className="flex shrink-0 flex-col items-end gap-1">
+                  <span className="grad-text font-heading text-[24px] leading-none">
+                    {row.points}
+                  </span>
+                  <span className="font-mono text-[8px] uppercase leading-none tracking-[0.14em] text-[var(--faint)]">
+                    Pts
+                  </span>
+                </span>
+              </div>
+            );
+          })}
+          <div className="flex items-center gap-2 rounded-[16px] border border-dashed border-[var(--border-strong)] p-3 text-[10.5px] font-semibold leading-[1.3] text-[var(--faint)]">
+            <span className="h-[3px] w-3 shrink-0 rounded-sm bg-[image:var(--grad-gold)]" />
+            Championship place · sorted by points, then goal difference
           </div>
         </div>
 

@@ -8,8 +8,8 @@ import { type Player, type Team } from "@/lib/types";
 
 /** Sub-tabs of the Overall workspace. Add further sections here. */
 const subTabs = [
-  { id: "teams-info", label: "Teams Info" },
   { id: "match-detail", label: "Match Detail" },
+  { id: "teams-info", label: "Teams Info" },
 ] as const;
 
 type SubTabId = (typeof subTabs)[number]["id"];
@@ -18,12 +18,14 @@ export function AdminWorkspace({
   teams,
   roster,
   rounds,
+  matchImageIds,
 }: {
   teams: Team[];
   roster: Player[];
   rounds: FixtureRound[];
+  matchImageIds: number[];
 }) {
-  const [active, setActive] = useState<SubTabId>("teams-info");
+  const [active, setActive] = useState<SubTabId>("match-detail");
 
   return (
     <div className="flex flex-col gap-4.5">
@@ -54,8 +56,10 @@ export function AdminWorkspace({
         </div>
       </div>
 
+      {active === "match-detail" ? (
+        <MatchDetail rounds={rounds} roster={roster} matchImageIds={matchImageIds} />
+      ) : null}
       {active === "teams-info" ? <TeamsInfo teams={teams} roster={roster} /> : null}
-      {active === "match-detail" ? <MatchDetail rounds={rounds} roster={roster} /> : null}
     </div>
   );
 }

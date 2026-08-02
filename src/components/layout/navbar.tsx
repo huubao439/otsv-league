@@ -4,8 +4,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
 import { isAdminSession } from "@/lib/admin-auth";
 
 const ThemeToggle = dynamic(
@@ -27,7 +25,6 @@ const adminNavItem = { href: "/admin", label: "Overall" };
 
 export function Navbar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
   const navItems = isAdminSession() ? [...publicNavItems, adminNavItem] : publicNavItems;
 
   const isActive = (href: string) =>
@@ -52,7 +49,9 @@ export function Navbar() {
               OTSV Football League
             </span>
             <span className="truncate font-mono text-[10.5px] font-medium uppercase leading-tight tracking-[0.14em] text-[var(--faint)]">
-              Corporate Championship · Season 2026
+              {/* Shorter on mobile so it never truncates; full label from md up. */}
+              <span className="md:hidden">Season 2026</span>
+              <span className="hidden md:inline">Corporate Championship · Season 2026</span>
             </span>
           </span>
         </Link>
@@ -81,38 +80,8 @@ export function Navbar() {
             Round 1 · kicks off Mon 17 Aug
           </span>
           <ThemeToggle />
-          <button
-            type="button"
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-[var(--surface)] text-foreground transition-colors hover:border-[var(--border-strong)] md:hidden"
-            data-testid="mobile-menu-toggle"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X size={18} /> : <Menu size={18} />}
-          </button>
         </div>
       </div>
-
-      {open ? (
-        <div className="border-t border-border bg-[var(--bg-deep)] px-4 pb-4 pt-2 md:hidden">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-testid={`mobile-nav-link-${item.label.toLowerCase()}`}
-              onClick={() => setOpen(false)}
-              className={
-                isActive(item.href)
-                  ? "mt-1 flex w-full items-center rounded-full bg-[image:var(--grad)] px-4 py-2.5 text-sm font-bold text-white"
-                  : "mt-1 flex w-full items-center rounded-full px-4 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      ) : null}
     </header>
   );
 }

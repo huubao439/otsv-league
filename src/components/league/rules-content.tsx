@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { PageHeading } from "@/components/league/page-heading";
 import {
@@ -47,6 +48,14 @@ export function RulesContent() {
   // English is the default; the toggle swaps in the original Vietnamese.
   const [locale, setLocale] = useState<RuleLocale>("en");
   const doc = rulesByLocale[locale];
+
+  // Section numbers are the same across locales, so the collapse state survives
+  // a language switch. Collapse only takes effect on mobile — every section body
+  // is `md:flex`, so desktop always shows them expanded (unchanged).
+  const [openSections, setOpenSections] = useState<string[]>(["I"]);
+  const isOpen = (n: string) => openSections.includes(n);
+  const toggleSection = (n: string) =>
+    setOpenSections((prev) => (prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n]));
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
@@ -97,27 +106,44 @@ export function RulesContent() {
           </p>
         </div>
 
-        {doc.sections.map((section) => (
-          <section
-            key={section.number}
-            className="flex flex-col gap-4 rounded-[20px] border border-border bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]"
-          >
-            <div className="flex items-baseline gap-3 border-b border-border pb-3">
-              <span className="font-heading text-[20px] leading-none text-[var(--pink)]">
-                {section.number}
-              </span>
-              <h2 className="m-0 font-heading text-[20px] uppercase leading-none">
-                {section.heading}
-              </h2>
-            </div>
+        {doc.sections.map((section) => {
+          const open = isOpen(section.number);
 
-            <div className="flex flex-col gap-5">
-              {section.groups.map((group, index) => (
-                <Group key={index} group={group} />
-              ))}
-            </div>
-          </section>
-        ))}
+          return (
+            <section
+              key={section.number}
+              className="flex flex-col gap-4 rounded-[20px] border border-border bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]"
+            >
+              {/* Header toggles the section on mobile; inert on desktop, where
+                  the body is always shown. */}
+              <button
+                type="button"
+                onClick={() => toggleSection(section.number)}
+                aria-expanded={open}
+                className="flex w-full items-center gap-3 border-b border-border pb-3 text-left md:pointer-events-none"
+              >
+                <span className="font-heading text-[20px] leading-none text-[var(--pink)]">
+                  {section.number}
+                </span>
+                <h2 className="m-0 font-heading text-[20px] uppercase leading-none">
+                  {section.heading}
+                </h2>
+                <ChevronDown
+                  aria-hidden
+                  className={`ml-auto h-5 w-5 shrink-0 text-muted-foreground transition-transform md:hidden ${
+                    open ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              <div className={`flex-col gap-5 md:flex ${open ? "flex" : "hidden"}`}>
+                {section.groups.map((group, index) => (
+                  <Group key={index} group={group} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
         <p className="m-0 rounded-[20px] border border-dashed border-[var(--border-strong)] p-5 text-[12.5px] font-semibold italic leading-[1.6] text-[var(--faint)]">
           {doc.note}

@@ -12,7 +12,7 @@ const pages = [
 
 export function Footer() {
   return (
-    <footer className="relative z-1 border-t border-border bg-[var(--bg-deep)]">
+    <footer className="relative z-1 hidden border-t border-border bg-[var(--bg-deep)] md:block">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 py-7 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-4">
           <div className="flex items-center gap-3">

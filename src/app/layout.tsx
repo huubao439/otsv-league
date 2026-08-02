@@ -1,5 +1,6 @@
 import { Anton, JetBrains_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { TeamLogoProvider } from "@/components/league/team-logo-provider";
@@ -63,12 +64,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-full bg-background text-foreground">
         <TeamLogoProvider logos={teamLogos}>
-          <div className="relative isolate flex min-h-screen flex-col overflow-hidden">
+          {/* Extra bottom padding on mobile clears the fixed BottomNav; removed at md. */}
+          <div className="relative isolate flex min-h-screen flex-col overflow-hidden pb-[64px] md:pb-0">
             <div className="ambient-bloom" aria-hidden />
             <Navbar />
             <main className="relative z-1 flex-1">{children}</main>
             <Footer />
           </div>
+          <BottomNav />
         </TeamLogoProvider>
       </body>
     </html>

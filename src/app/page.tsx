@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Countdown } from "@/components/league/countdown";
 import { FormGuide } from "@/components/league/form-guide";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
+import { MobileHome } from "@/components/league/mobile-home";
 import { SectionHeading } from "@/components/league/section-heading";
 import { TeamLogo } from "@/components/league/team-logo";
 import {
@@ -34,7 +35,21 @@ export default async function Home() {
   const progressPct = Math.max(3, Math.round((progress.played / progress.total) * 100));
 
   return (
-    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-6 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
+    <>
+      {/* Mobile-only layout from the design; the desktop version follows at md. */}
+      <MobileHome
+        opener={opener}
+        nextRound={nextRound}
+        kickoffIso={kickoffIso}
+        roundFixtures={upcomingFixtures}
+        topTeams={table.slice(0, 3)}
+        progress={progress}
+        progressPct={progressPct}
+        totalTeams={table.length}
+        totalRounds={ROUNDS.length}
+      />
+
+      <div className="mx-auto hidden w-full max-w-[1280px] flex-col gap-6 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up md:flex">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[26px] border border-border shadow-[var(--shadow-soft)]">
         <div className="absolute inset-0 bg-[image:var(--grad)] opacity-[0.92]" />
@@ -399,6 +414,7 @@ export default async function Home() {
           </p>
         )}
       </section>
-    </div>
+      </div>
+    </>
   );
 }

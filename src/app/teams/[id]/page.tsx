@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FormGuide } from "@/components/league/form-guide";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
+import { MobileTeamDetail } from "@/components/league/mobile-team-detail";
 import { SectionHeading } from "@/components/league/section-heading";
 import { SquadTable } from "@/components/league/squad-table";
 import { TeamLogo } from "@/components/league/team-logo";
@@ -58,8 +59,71 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
     return total + line.yellowCards + line.redCards;
   }, 0);
 
+  const goalDifference =
+    standing && standing.goalDifference > 0
+      ? `+${standing.goalDifference}`
+      : String(standing?.goalDifference ?? 0);
+
+  // Pre-shaped data for the mobile layout (serializable props only).
+  const shortDate = (iso: string) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    const month = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ][m - 1];
+    return `${d} ${month} ${String(y).slice(2)}`;
+  };
+  const mobileFixtures = fixtures.map((match) => {
+    const home = match.homeTeamId === teamId;
+    return {
+      id: match.id,
+      round: match.round,
+      opponent: home ? match.awayTeam : match.homeTeam,
+      time: match.time,
+      dateLabel: shortDate(match.date),
+      status: match.status,
+      scoreLine:
+        match.status === "finished"
+          ? home
+            ? `${match.homeScore} - ${match.awayScore}`
+            : `${match.awayScore} - ${match.homeScore}`
+          : null,
+    };
+  });
+  const mobileSquad = roster.map((player) => {
+    const line = statsForPlayer(playerStats, player.id);
+    return {
+      id: player.id,
+      name: player.name,
+      jerseyName: player.jerseyName,
+      shirtNumber: player.shirtNumber,
+      isCaptain: player.isCaptain,
+      goals: line.goals,
+      yellowCards: line.yellowCards,
+      redCards: line.redCards,
+    };
+  });
+
   return (
-    <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5 px-4 py-7 pb-18 sm:px-6 lg:px-8 animate-fade-up">
+    <>
+      <MobileTeamDetail
+        team={team}
+        ranking={ranking}
+        played={standing?.played ?? 0}
+        goalDifference={goalDifference}
+        points={standing?.points ?? 0}
+        form={form}
+        fixtures={mobileFixtures}
+        squad={mobileSquad}
+        teamStats={{
+          goalsFor: standing?.goalsFor ?? 0,
+          goalsAgainst: standing?.goalsAgainst ?? 0,
+          cleanSheets,
+          cards,
+        }}
+      />
+
+      <div className="mx-auto hidden w-full max-w-[1280px] flex-col gap-5 px-4 py-7 pb-18 sm:px-6 lg:px-8 animate-fade-up md:flex">
       <Link
         href="/teams"
         className="self-start rounded-full border border-border bg-[var(--surface)] px-3.5 py-2.5 text-[12.5px] font-bold leading-none text-muted-foreground transition-colors hover:border-[var(--border-strong)] hover:text-foreground"
@@ -191,6 +255,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
           <SquadTable roster={roster} stats={playerStats} />
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

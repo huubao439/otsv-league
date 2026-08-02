@@ -5,7 +5,7 @@ import { PageHeading } from "@/components/league/page-heading";
 import { ROUNDS, matchesByRoundFrom } from "@/data/league";
 import { teams } from "@/data/mock";
 import { isAdminSession } from "@/lib/admin-auth";
-import { getMatches, getRoster } from "@/lib/server/league-data";
+import { getMatchImageIndex, getMatches, getRoster } from "@/lib/server/league-data";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,11 @@ export default async function AdminPage() {
     notFound();
   }
 
-  const [roster, allMatches] = await Promise.all([getRoster(), getMatches()]);
+  const [roster, allMatches, imageIndex] = await Promise.all([
+    getRoster(),
+    getMatches(),
+    getMatchImageIndex(),
+  ]);
   const rounds = ROUNDS.map((round) => ({
     round,
     matches: matchesByRoundFrom(allMatches, round),
@@ -31,7 +35,12 @@ export default async function AdminPage() {
         accent="tab"
         aside={<LogoutButton />}
       />
-      <AdminWorkspace teams={teams} roster={roster} rounds={rounds} />
+      <AdminWorkspace
+        teams={teams}
+        roster={roster}
+        rounds={rounds}
+        matchImageIds={imageIndex}
+      />
     </div>
   );
 }
