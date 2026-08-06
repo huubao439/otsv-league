@@ -23,7 +23,7 @@ const publicNavItems = [
 /** Only rendered for a signed-in admin. See src/lib/admin-auth.ts. */
 const adminNavItem = { href: "/admin", label: "Overall" };
 
-export function Navbar() {
+export function Navbar({ scheduleLabel }: { scheduleLabel?: string | null }) {
   const pathname = useActivePath();
   const navItems = isAdminSession() ? [...publicNavItems, adminNavItem] : publicNavItems;
 
@@ -74,11 +74,14 @@ export function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2.5 md:ml-0">
-          {/* Needs 2xl now that Rules is in the nav; below that the header crowds. */}
-          <span className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-border bg-[var(--surface)] px-3.5 py-2 text-xs font-semibold text-muted-foreground 2xl:inline-flex">
-            <span className="h-[7px] w-[7px] rounded-full bg-[var(--gold)] animate-pulse-dot" />
-            Round 1 · kicks off Mon 17 Aug
-          </span>
+          {/* Next-round label comes from the schedule (see RootLayout), so it never
+              goes stale. Needs 2xl now that Rules is in the nav; the header crowds below. */}
+          {scheduleLabel ? (
+            <span className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-border bg-[var(--surface)] px-3.5 py-2 text-xs font-semibold text-muted-foreground 2xl:inline-flex">
+              <span className="h-[7px] w-[7px] rounded-full bg-[var(--gold)] animate-pulse-dot" />
+              {scheduleLabel}
+            </span>
+          ) : null}
           <ThemeToggle />
         </div>
       </div>
