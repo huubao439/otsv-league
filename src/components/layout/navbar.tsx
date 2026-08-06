@@ -3,8 +3,8 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { isAdminSession } from "@/lib/admin-auth";
+import { useActivePath } from "@/lib/use-active-path";
 
 const ThemeToggle = dynamic(
   () => import("@/components/layout/theme-toggle").then((mod) => mod.ThemeToggle),
@@ -24,7 +24,7 @@ const publicNavItems = [
 const adminNavItem = { href: "/admin", label: "Overall" };
 
 export function Navbar() {
-  const pathname = usePathname();
+  const pathname = useActivePath();
   const navItems = isAdminSession() ? [...publicNavItems, adminNavItem] : publicNavItems;
 
   const isActive = (href: string) =>

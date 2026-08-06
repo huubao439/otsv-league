@@ -1,12 +1,13 @@
 "use client";
 
-import { Video } from "lucide-react";
+import { CalendarDays, MapPin, Video } from "lucide-react";
 import Link from "next/link";
 import { Fragment, useState } from "react";
+import { MatchMeta } from "@/components/league/match-meta";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
-import { formatKickoff, type MatchWithTeams } from "@/data/league";
+import { STADIUM, formatMatchDate, type MatchWithTeams } from "@/data/league";
 
 const matchColumns =
   "grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:grid-cols-[150px_minmax(0,1fr)_86px_minmax(0,1fr)_128px] min-w-0 md:min-w-[720px]";
@@ -70,11 +71,24 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
         >
           {/* Round header — desktop bar */}
           <div className="hidden flex-wrap items-center justify-between gap-3 border-b border-border bg-[var(--surface-2)] px-6 py-4.5 md:flex">
-            <div className="flex flex-wrap items-center gap-3.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               <span className="font-heading text-[22px] uppercase leading-none">Round {round}</span>
-              <span className="text-[12.5px] font-semibold leading-none text-muted-foreground">
-                {matches.at(0) ? formatKickoff(matches[0].date, matches[0].time) : "To be scheduled"}
-              </span>
+              {matches.at(0) ? (
+                <>
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-[var(--surface)] px-2.5 py-1.5 text-[12px] font-bold leading-none text-foreground">
+                    <CalendarDays className="h-3.5 w-3.5 text-[var(--faint)]" />
+                    {formatMatchDate(matches[0].date)}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-[image:var(--grad-soft)] px-2.5 py-1.5 text-[12px] font-bold leading-none text-foreground">
+                    <MapPin className="h-3.5 w-3.5 text-[var(--pink)]" />
+                    {STADIUM}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[12.5px] font-semibold leading-none text-muted-foreground">
+                  To be scheduled
+                </span>
+              )}
             </div>
             <span className="font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--faint)]">
               {matches.length} matches
@@ -82,10 +96,24 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
           </div>
 
           {/* Round header — mobile inline label */}
-          <div className="flex items-center justify-between md:hidden">
-            <span className="flex items-center gap-2 font-mono text-[9.5px] font-medium uppercase tracking-[0.14em] text-[var(--faint)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--gold)] animate-pulse-dot" />
-              {matches.at(0) ? formatKickoff(matches[0].date, matches[0].time) : "To be scheduled"}
+          <div className="flex flex-wrap items-center justify-between gap-2 md:hidden">
+            <span className="inline-flex flex-wrap items-center gap-1.5">
+              {matches.at(0) ? (
+                <>
+                  <span className="inline-flex items-center gap-1 rounded-md border border-border bg-[var(--surface)] px-2 py-1 text-[10px] font-bold leading-none text-foreground">
+                    <CalendarDays className="h-3 w-3 text-[var(--faint)]" />
+                    {formatMatchDate(matches[0].date)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-md border border-[var(--border-strong)] bg-[image:var(--grad-soft)] px-2 py-1 text-[10px] font-bold leading-none text-foreground">
+                    <MapPin className="h-3 w-3 text-[var(--pink)]" />
+                    {STADIUM}
+                  </span>
+                </>
+              ) : (
+                <span className="font-mono text-[9.5px] font-medium uppercase tracking-[0.14em] text-[var(--faint)]">
+                  To be scheduled
+                </span>
+              )}
             </span>
             <span className="font-mono text-[10px] font-medium uppercase text-[var(--faint)]">
               {matches.length} matches
@@ -96,10 +124,14 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
             <Fragment key={match.id}>
               {/* Mobile card — crest over name, VS in the middle, roomy tap targets. */}
               <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-[var(--surface)] p-3.5 shadow-[var(--shadow-soft)] md:hidden">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] leading-none tracking-[0.1em] text-[var(--faint)]">
-                    {formatKickoff(match.date, match.time)}
-                  </span>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <MatchMeta
+                    date={match.date}
+                    time={match.time}
+                    pitch={match.pitch}
+                    showDate={false}
+                    showStadium={false}
+                  />
                   <MatchStatusBadge status={match.status} />
                 </div>
                 <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2.5">
@@ -140,8 +172,14 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
                 style={{ animationDelay: `${index * 50}ms` }}
                 className={`hidden ${matchColumns} items-center gap-x-4 gap-y-3 border-b border-border px-6 py-4 transition-colors last:border-b-0 hover:bg-[var(--surface-2)] animate-fade-up md:grid`}
               >
-                <span className="col-span-3 flex flex-wrap items-center gap-2 font-mono text-[11px] leading-none tracking-[0.1em] text-[var(--faint)] md:col-span-1">
-                  {formatKickoff(match.date, match.time)}
+                <span className="col-span-3 flex flex-col items-start gap-2 md:col-span-1">
+                  <MatchMeta
+                    date={match.date}
+                    time={match.time}
+                    pitch={match.pitch}
+                    showDate={false}
+                    showStadium={false}
+                  />
                   <MatchStatusBadge status={match.status} />
                 </span>
 

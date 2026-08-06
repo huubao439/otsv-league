@@ -77,6 +77,7 @@ export function MobileHome({
                 <span>Opening match</span>
                 <span>
                   {kickoffIso ? shortDate(opener.date) : ""} · {opener.time}
+                  {opener.pitch ? ` · Pitch ${opener.pitch}` : ""}
                 </span>
               </div>
               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
@@ -165,8 +166,13 @@ export function MobileHome({
                 key={match.id}
                 className="flex items-center gap-2.5 border-b border-border px-3 py-2.5 last:border-b-0"
               >
-                <span className="w-9 shrink-0 font-mono text-[9.5px] leading-none tracking-[0.08em] text-[var(--faint)]">
-                  {match.time}
+                <span className="flex w-11 shrink-0 flex-col gap-1 font-mono leading-none tracking-[0.08em]">
+                  <span className="text-[9.5px] font-bold text-foreground">{match.time}</span>
+                  {match.pitch ? (
+                    <span className="inline-flex w-fit items-center rounded bg-[image:var(--grad-soft)] px-1 py-0.5 text-[7.5px] font-bold text-[var(--pink)]">
+                      {match.pitch}
+                    </span>
+                  ) : null}
                 </span>
                 <TeamLogo team={match.homeTeam} size="sm" shape="squircle" />
                 <span className="min-w-0 flex-1 truncate text-[12px] font-extrabold leading-tight">

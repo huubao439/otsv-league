@@ -25,7 +25,7 @@ const statValue = "font-heading text-[20px] leading-none";
 
 export default async function TeamsPage() {
   const [allMatches, roster] = await Promise.all([getMatches(), getRoster()]);
-  const table = standingsWithTeamsFrom(allMatches);
+  const table = standingsWithTeamsFrom(allMatches, roster);
   const rankOf = (teamId: number) => table.findIndex((row) => row.teamId === teamId) + 1;
 
   return (

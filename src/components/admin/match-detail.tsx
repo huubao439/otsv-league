@@ -1,12 +1,13 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { MatchMeta } from "@/components/league/match-meta";
 import { TeamLogo } from "@/components/league/team-logo";
 import { saveMatchAction } from "@/app/admin/actions";
 import { MatchImage } from "@/components/admin/match-image";
 import { type FixtureRound } from "@/components/league/fixtures-board";
-import { formatKickoff, type MatchWithTeams } from "@/data/league";
+import { STADIUM, type MatchWithTeams } from "@/data/league";
 import { type MatchEvent, type Player, type Team } from "@/lib/types";
 
 const MAX_GOALS = 10;
@@ -420,8 +421,14 @@ function RoundBlock({
 }) {
   return (
     <div className="overflow-hidden rounded-[18px] border border-border bg-[var(--surface)]">
-      <div className="flex items-center justify-between gap-3 border-b border-border bg-[var(--surface-2)] px-4 py-3 sm:px-5">
-        <span className="font-heading text-[18px] uppercase leading-none">Round {round}</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-[var(--surface-2)] px-4 py-3 sm:px-5">
+        <span className="flex flex-wrap items-center gap-2.5">
+          <span className="font-heading text-[18px] uppercase leading-none">Round {round}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-[image:var(--grad-soft)] px-2.5 py-1.5 text-[11.5px] font-bold leading-none text-foreground">
+            <MapPin className="h-3.5 w-3.5 text-[var(--pink)]" />
+            {STADIUM}
+          </span>
+        </span>
         <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--faint)]">
           {matches.length} matches
         </span>
@@ -432,8 +439,13 @@ function RoundBlock({
           {/* Mobile: date on its own line, teams full-width so names never clip.
               Desktop (sm+): single inline row, unchanged. */}
           <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-5">
-            <span className="shrink-0 font-mono text-[10.5px] leading-none tracking-[0.1em] text-[var(--faint)] sm:w-32">
-              {formatKickoff(match.date, match.time)}
+            <span className="shrink-0 sm:w-40">
+              <MatchMeta
+                date={match.date}
+                time={match.time}
+                pitch={match.pitch}
+                showStadium={false}
+              />
             </span>
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:flex sm:flex-1 sm:gap-3">
               <span className="flex min-w-0 items-center justify-end gap-2.5 sm:flex-1">

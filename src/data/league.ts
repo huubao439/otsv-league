@@ -1,4 +1,5 @@
 import { calculateStandings, matches, players, standings, teams } from "@/data/mock";
+import { fairPlayTableFrom } from "@/data/stats";
 import { type Match, type Player, type Standing, type Team } from "@/lib/types";
 
 export type StandingWithTeam = Standing & {
@@ -19,8 +20,99 @@ export const ROUNDS = Array.from({ length: 5 }, (_, index) => index + 1);
  * share one implementation.
  */
 
-export function standingsWithTeamsFrom(source: Match[]): StandingWithTeam[] {
-  return calculateStandings(source)
+/** Points/goals a group of tied teams earned only in matches among themselves. */
+function headToHead(source: Match[], groupIds: Set<number>) {
+  const acc = new Map<number, { pts: number; gf: number; ga: number }>();
+  for (const id of groupIds) {
+    acc.set(id, { pts: 0, gf: 0, ga: 0 });
+  }
+
+  for (const match of source) {
+    if (match.status !== "finished" || match.homeScore === null || match.awayScore === null) {
+      continue;
+    }
+    if (!groupIds.has(match.homeTeamId) || !groupIds.has(match.awayTeamId)) {
+      continue;
+    }
+
+    const home = acc.get(match.homeTeamId)!;
+    const away = acc.get(match.awayTeamId)!;
+    home.gf += match.homeScore;
+    home.ga += match.awayScore;
+    away.gf += match.awayScore;
+    away.ga += match.homeScore;
+
+    if (match.homeScore > match.awayScore) {
+      home.pts += 3;
+    } else if (match.homeScore < match.awayScore) {
+      away.pts += 3;
+    } else {
+      home.pts += 1;
+      away.pts += 1;
+    }
+  }
+
+  return acc;
+}
+
+/**
+ * Orders the table by the Tournament Rules (section I.3): points first, then
+ * within a group tied on points — head-to-head result, goal difference, goals
+ * scored, fair-play index (fewer cards ranks higher), and a stable fallback
+ * standing in for the drawing of lots.
+ *
+ * Head-to-head is a mini-league over just the tied teams' mutual matches, so a
+ * three-way tie uses the points among those three, as the rules require.
+ */
+function orderStandings(
+  rows: Standing[],
+  source: Match[],
+  fairPlayPenalty: Map<number, number>,
+): Standing[] {
+  const byPoints = [...rows].sort((a, b) => b.points - a.points);
+  const ordered: Standing[] = [];
+
+  for (let start = 0; start < byPoints.length; ) {
+    let end = start;
+    while (end < byPoints.length && byPoints[end].points === byPoints[start].points) {
+      end += 1;
+    }
+
+    const group = byPoints.slice(start, end);
+    if (group.length > 1) {
+      const ids = new Set(group.map((row) => row.teamId));
+      const h2h = headToHead(source, ids);
+
+      group.sort((a, b) => {
+        const ha = h2h.get(a.teamId)!;
+        const hb = h2h.get(b.teamId)!;
+        return (
+          hb.pts - ha.pts || // 1. head-to-head points
+          b.goalDifference - a.goalDifference || // 2. overall goal difference
+          b.goalsFor - a.goalsFor || // 3. overall goals scored
+          (fairPlayPenalty.get(a.teamId) ?? 0) - (fairPlayPenalty.get(b.teamId) ?? 0) || // 4. fair play
+          a.teamId - b.teamId // 5. drawing lots (stable)
+        );
+      });
+    }
+
+    ordered.push(...group);
+    start = end;
+  }
+
+  return ordered;
+}
+
+export function standingsWithTeamsFrom(source: Match[], roster: Player[]): StandingWithTeam[] {
+  // Fair-play penalty: yellow = 1, red = 3, mirroring the rules' fair-play index.
+  const fairPlayPenalty = new Map(
+    fairPlayTableFrom(source, roster).map((row) => [
+      row.team.id,
+      row.yellowCards + row.redCards * 3,
+    ]),
+  );
+
+  return orderStandings(calculateStandings(source), source, fairPlayPenalty)
     .map((row) => {
       const team = getTeamById(row.teamId);
       return team ? { ...row, team } : null;
@@ -253,4 +345,21 @@ export function getEmbedUrl(url: string | undefined): string {
 
 export function formatKickoff(date: string, time: string): string {
   return `${date} - ${time}`;
+}
+
+/** Every fixture is played here, so the venue is shown once, not per match. */
+export const STADIUM = "Chuyen Viet Stadium";
+
+/** "2026-08-13" → "Thu 13 Aug". Deterministic (UTC), so no hydration drift. */
+export function formatMatchDate(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+    new Date(Date.UTC(year, month - 1, day)).getUTCDay()
+  ];
+  const monthName = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ][month - 1];
+
+  return `${weekday} ${day} ${monthName}`;
 }

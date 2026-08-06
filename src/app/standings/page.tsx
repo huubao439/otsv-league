@@ -8,7 +8,7 @@ import {
   standingsWithTeamsFrom,
   teamFormFrom,
 } from "@/data/league";
-import { getMatches } from "@/lib/server/league-data";
+import { getMatches, getRoster } from "@/lib/server/league-data";
 
 // Pos | Team | Pts | P | W | D | L | GF | GA | GD | Form — points sit first so
 // they read as the headline number rather than a trailing total.
@@ -16,8 +16,8 @@ const columns =
   "grid-cols-[48px_minmax(0,1fr)_60px_42px_42px_42px_42px_46px_46px_52px_96px] min-w-[770px]";
 
 export default async function StandingsPage() {
-  const allMatches = await getMatches();
-  const rows = standingsWithTeamsFrom(allMatches);
+  const [allMatches, roster] = await Promise.all([getMatches(), getRoster()]);
+  const rows = standingsWithTeamsFrom(allMatches, roster);
   const progress = seasonProgressFrom(allMatches);
   const roundsPlayed = Math.floor(progress.played / (progress.total / ROUNDS.length));
 
@@ -205,11 +205,13 @@ export default async function StandingsPage() {
 
           <div className="flex flex-col gap-3 rounded-[20px] border border-border bg-[image:var(--grad-soft)] p-5.5">
             <h3 className="m-0 font-heading text-[19px] uppercase">Tiebreakers</h3>
+            {/* Order mirrors the Tournament Rules (section I.3). */}
             <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-4.5 text-[12.5px] font-semibold leading-[1.4] text-muted-foreground">
+              <li>Head-to-head result</li>
               <li>Goal difference</li>
               <li>Goals scored</li>
-              <li>Head-to-head result</li>
-              <li>Penalty shootout</li>
+              <li>Fair-play index</li>
+              <li>Drawing lots</li>
             </ol>
           </div>
 

@@ -5,8 +5,8 @@
     "abbr": "IN",
     "department": "Integration Services",
     "logo": "https://images.unsplash.com/photo-1494172961521-33799ddd43a5?auto=format&fit=crop&w=160&q=80",
-    "colorCode": "#22C55E",
-    "gradient": "linear-gradient(140deg,#34d399,#0f766e)"
+    "colorCode": "#FFFFFF",
+    "gradient": "linear-gradient(140deg,#ffffff,#dcdce1)"
   },
   {
     "id": 2,
@@ -23,8 +23,8 @@
     "abbr": "MAT",
     "department": "Data & Analytics",
     "logo": "https://images.unsplash.com/photo-1552667466-07770ae110d0?auto=format&fit=crop&w=160&q=80",
-    "colorCode": "#F2E6CC",
-    "gradient": "linear-gradient(140deg,#fdf6e6,#e0cda6)"
+    "colorCode": "#7B1E2A",
+    "gradient": "linear-gradient(140deg,#EADFD2,#7B1E2A)"
   },
   {
     "id": 4,

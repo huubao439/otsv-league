@@ -35,11 +35,11 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
     notFound();
   }
 
-  const allMatches = await getMatches();
-  const table = standingsWithTeamsFrom(allMatches);
+  const [allMatches, fullRoster] = await Promise.all([getMatches(), getRoster()]);
+  const table = standingsWithTeamsFrom(allMatches, fullRoster);
   const standing = table.find((row) => row.teamId === teamId);
   const ranking = table.findIndex((row) => row.teamId === teamId) + 1;
-  const roster = (await getRoster())
+  const roster = fullRoster
     .filter((player) => player.teamId === teamId)
     .sort((a, b) => a.shirtNumber - b.shirtNumber);
   const fixtures = allMatches

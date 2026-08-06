@@ -6,10 +6,9 @@ import { LEAGUE_TAG } from "@/lib/server/kv";
 import {
   deleteMatchImage,
   getMatchImage,
-  getMatches,
   getRoster,
   saveMatchImage,
-  saveMatches,
+  saveMatchResult,
   saveRoster,
 } from "@/lib/server/league-data";
 import {
@@ -204,23 +203,16 @@ export async function getMatchImageAction(matchId: number): Promise<string | nul
 }
 
 export async function saveMatchAction(matchId: number, draft: MatchResultDraft) {
-  const matches = await getMatches();
   const scored = draft.homeScore !== null && draft.awayScore !== null;
 
-  await saveMatches(
-    matches.map((match) =>
-      match.id === matchId
-        ? {
-            ...match,
-            homeScore: draft.homeScore,
-            awayScore: draft.awayScore,
-            // A match counts towards the table only once both scores are in.
-            status: scored ? "finished" : "upcoming",
-            videoHighlightUrl: draft.videoHighlightUrl.trim(),
-            events: draft.events,
-          }
-        : match,
-    ),
-  );
+  await saveMatchResult({
+    id: matchId,
+    homeScore: draft.homeScore,
+    awayScore: draft.awayScore,
+    // A match counts towards the table only once both scores are in.
+    status: scored ? "finished" : "upcoming",
+    videoHighlightUrl: draft.videoHighlightUrl.trim(),
+    events: draft.events,
+  });
   refresh();
 }

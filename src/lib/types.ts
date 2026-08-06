@@ -60,6 +60,8 @@ export interface Match {
   awayScore: number | null;
   date: string;
   time: string;
+  /** Pitch code at the stadium, e.g. "B1". See STADIUM in src/data/league.ts. */
+  pitch?: string;
   status: MatchStatus;
   round: number;
   videoHighlightUrl?: string;

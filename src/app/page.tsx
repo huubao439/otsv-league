@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Countdown } from "@/components/league/countdown";
 import { FormGuide } from "@/components/league/form-guide";
+import { MatchMeta } from "@/components/league/match-meta";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
 import { MobileHome } from "@/components/league/mobile-home";
 import { SectionHeading } from "@/components/league/section-heading";
 import { TeamLogo } from "@/components/league/team-logo";
 import {
   ROUNDS,
-  formatKickoff,
+  STADIUM,
   latestResultsFrom,
   nextKickoffIsoFrom,
   nextRoundFixturesFrom,
@@ -16,7 +17,7 @@ import {
   standingsWithTeamsFrom,
   teamFormFrom,
 } from "@/data/league";
-import { getMatches } from "@/lib/server/league-data";
+import { getMatches, getRoster } from "@/lib/server/league-data";
 
 // Pos | Team | Pts | P | W | D | L | GD | Form — points sit first so they read
 // as the headline number rather than a trailing total.
@@ -24,8 +25,8 @@ const tableColumns =
   "grid-cols-[44px_minmax(0,1fr)_56px_40px_40px_40px_40px_52px_92px] min-w-[660px]";
 
 export default async function Home() {
-  const allMatches = await getMatches();
-  const table = standingsWithTeamsFrom(allMatches);
+  const [allMatches, roster] = await Promise.all([getMatches(), getRoster()]);
+  const table = standingsWithTeamsFrom(allMatches, roster);
   const latestResults = latestResultsFrom(allMatches, 3);
   const upcomingFixtures = nextRoundFixturesFrom(allMatches);
   const nextRound = upcomingFixtures.at(0)?.round;
@@ -296,11 +297,14 @@ export default async function Home() {
             <div className="flex flex-col gap-3">
               {latestResults.map((match) => (
                 <div key={match.id} className="rounded-2xl border border-border bg-[var(--surface-2)] p-3.5">
-                  <div className="mb-2.5 flex items-center justify-between gap-2">
+                  <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
                     <MatchStatusBadge status={match.status} />
-                    <span className="font-mono text-[10.5px] tracking-[0.1em] text-[var(--faint)]">
-                      {formatKickoff(match.date, match.time)}
-                    </span>
+                    <MatchMeta
+                      date={match.date}
+                      time={match.time}
+                      pitch={match.pitch}
+                      showStadium={false}
+                    />
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2.5">
                     <span className="flex min-w-0 items-center justify-end gap-2">
@@ -383,8 +387,13 @@ export default async function Home() {
                   index < upcomingFixtures.length - 1 ? "md:border-r md:border-border" : ""
                 }`}
               >
-                <div className="flex items-center justify-between font-mono text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--faint)]">
-                  <span>{formatKickoff(match.date, match.time)}</span>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <MatchMeta
+                    date={match.date}
+                    time={match.time}
+                    pitch={match.pitch}
+                    showStadium={false}
+                  />
                   <MatchStatusBadge status={match.status} />
                 </div>
                 <div className="flex items-center justify-between gap-3">
@@ -403,7 +412,7 @@ export default async function Home() {
                   </span>
                 </div>
                 <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--faint)]">
-                  Round {match.round}
+                  Round {match.round} · {STADIUM}
                 </span>
               </div>
             ))}
