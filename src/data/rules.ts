@@ -181,7 +181,7 @@ const en: RulesDoc = {
       groups: [
         {
           intro:
-            "Within the approved budget, the following awards are presented on the closing day, 29 August 2026:",
+            "Within the approved budget, the following awards are presented on the closing day, 27 August 2026:",
           ordered: true,
           items: [
             { label: "Champions (cup + flag)", text: "3,000,000 VND" },
@@ -345,7 +345,7 @@ const vi: RulesDoc = {
       groups: [
         {
           intro:
-            "Theo ngân sách đã phê duyệt, các danh hiệu được trao vào ngày bế mạc (29/08/2026) bao gồm:",
+            "Theo ngân sách đã phê duyệt, các danh hiệu được trao vào ngày bế mạc (27/08/2026) bao gồm:",
           ordered: true,
           items: [
             { label: "Đội vô địch (Cup + Cờ)", text: "3.000.000 VNĐ" },
