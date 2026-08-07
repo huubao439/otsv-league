@@ -143,7 +143,7 @@ const en: RulesDoc = {
             },
             {
               label: "Accumulated fouls",
-              text: "The 10-metre penalty for six accumulated fouls does not apply, to keep an internal tournament from becoming too tense.",
+              text: "The 10-metre penalty kick applies once a team commits six accumulated fouls.",
             },
           ],
         },
@@ -307,7 +307,7 @@ const vi: RulesDoc = {
             },
             {
               label: "Lỗi tổng hợp",
-              text: "Không áp dụng luật đá phạt đền 10m khi tích lũy đủ 6 lỗi (để giảm bớt áp lực thi đấu căng thẳng nội bộ).",
+              text: "Áp dụng luật đá phạt đền 10m khi tích lũy đủ 6 lỗi.",
             },
           ],
         },
