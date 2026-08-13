@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FormGuide } from "@/components/league/form-guide";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import {
   ROUNDS,
   seasonProgressFrom,
@@ -79,12 +80,15 @@ export default async function StandingsPage() {
                 </span>
                 <span className="flex min-w-0 items-center gap-2.5">
                   <TeamLogo team={row.team} size="row" shape="bare" />
-                  <Link
-                    href={`/teams/${row.teamId}`}
-                    className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
-                  >
-                    {row.team.name}
-                  </Link>
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <Link
+                      href={`/teams/${row.teamId}`}
+                      className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
+                    >
+                      {row.team.name}
+                    </Link>
+                    <TeamProjects team={row.team} className="truncate" />
+                  </span>
                 </span>
                 <span className="grad-text text-center font-heading text-[23px] leading-none">
                   {row.points}
@@ -162,6 +166,7 @@ export default async function StandingsPage() {
                   >
                     {row.team.name}
                   </Link>
+                  <TeamProjects team={row.team} className="truncate text-[9.5px]" />
                   <span className="truncate font-mono text-[9.5px] leading-none tracking-[0.06em] text-[var(--faint)]">
                     P {row.played} · W {row.won} · D {row.drawn} · L {row.lost} · GD {gd}
                   </span>

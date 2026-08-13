@@ -6,6 +6,7 @@ import { MobileTeamDetail } from "@/components/league/mobile-team-detail";
 import { SectionHeading } from "@/components/league/section-heading";
 import { SquadTable } from "@/components/league/squad-table";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import {
   formatKickoff,
   getTeamById,
@@ -148,6 +149,9 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
               <h1 className="m-0 font-heading text-4xl uppercase leading-[0.94] sm:text-5xl lg:text-[62px]">
                 {team.name}
               </h1>
+              <span className="text-[13.5px] font-semibold leading-tight text-white/85">
+                {team.projects}
+              </span>
               <span className="flex items-center gap-3 text-[13.5px] font-semibold leading-none text-white/85">
                 Recent form
                 <FormGuide form={form} />
@@ -205,15 +209,21 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ id:
                     sides are shown the same way with this team first. */}
                 <span className="flex min-w-0 items-center gap-2.5">
                   <TeamLogo team={team} size="sm" />
-                  <span className="truncate text-[13.5px] font-extrabold leading-tight">
-                    {team.name}
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="truncate text-[13.5px] font-extrabold leading-tight">
+                      {team.name}
+                    </span>
+                    <TeamProjects team={team} className="truncate text-[9px]" />
                   </span>
                   <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--faint)]">
                     vs
                   </span>
                   <TeamLogo team={opponent} size="sm" />
-                  <span className="truncate text-[13.5px] font-extrabold leading-tight">
-                    {opponent.name}
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="truncate text-[13.5px] font-extrabold leading-tight">
+                      {opponent.name}
+                    </span>
+                    <TeamProjects team={opponent} className="truncate text-[9px]" />
                   </span>
                 </span>
                 <span className="flex items-center gap-2.5">

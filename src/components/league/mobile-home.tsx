@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Countdown } from "@/components/league/countdown";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import { type MatchWithTeams, type StandingWithTeam } from "@/data/league";
 
 /** "2026-08-17" → "Mon 17 Aug". Deterministic (UTC), so no hydration drift. */
@@ -86,12 +87,19 @@ export function MobileHome({
                   <span className="text-center text-[12px] font-extrabold leading-tight">
                     {opener.homeTeam.name}
                   </span>
+                  {/* White-on-tint here: the muted token is unreadable on the hero. */}
+                  <span className="text-center text-[9px] font-semibold leading-tight text-white/70">
+                    {opener.homeTeam.projects}
+                  </span>
                 </span>
                 <span className="font-heading text-[14px] tracking-[0.08em] text-white/70">VS</span>
                 <span className="flex flex-col items-center gap-1.5">
                   <TeamLogo team={opener.awayTeam} size="lg" shape="squircle" />
                   <span className="text-center text-[12px] font-extrabold leading-tight">
                     {opener.awayTeam.name}
+                  </span>
+                  <span className="text-center text-[9px] font-semibold leading-tight text-white/70">
+                    {opener.awayTeam.projects}
                   </span>
                 </span>
               </div>
@@ -175,12 +183,21 @@ export function MobileHome({
                   ) : null}
                 </span>
                 <TeamLogo team={match.homeTeam} size="sm" shape="squircle" />
-                <span className="min-w-0 flex-1 truncate text-[12px] font-extrabold leading-tight">
-                  {match.homeTeam.name}
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="truncate text-[12px] font-extrabold leading-tight">
+                    {match.homeTeam.name}
+                  </span>
+                  <TeamProjects team={match.homeTeam} className="truncate text-[8.5px]" />
                 </span>
                 <span className="shrink-0 font-mono text-[9px] leading-none text-[var(--faint)]">vs</span>
-                <span className="min-w-0 flex-1 truncate text-right text-[12px] font-extrabold leading-tight">
-                  {match.awayTeam.name}
+                <span className="flex min-w-0 flex-1 flex-col items-end gap-0.5">
+                  <span className="max-w-full truncate text-right text-[12px] font-extrabold leading-tight">
+                    {match.awayTeam.name}
+                  </span>
+                  <TeamProjects
+                    team={match.awayTeam}
+                    className="max-w-full truncate text-right text-[8.5px]"
+                  />
                 </span>
                 <TeamLogo team={match.awayTeam} size="sm" shape="squircle" />
               </div>
@@ -222,12 +239,15 @@ export function MobileHome({
                     {index + 1}
                   </span>
                   <TeamLogo team={row.team} size="ml" shape="squircle" />
-                  <Link
-                    href={`/teams/${row.teamId}`}
-                    className="min-w-0 flex-1 truncate text-[13px] font-extrabold leading-tight text-foreground"
-                  >
-                    {row.team.name}
-                  </Link>
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <Link
+                      href={`/teams/${row.teamId}`}
+                      className="truncate text-[13px] font-extrabold leading-tight text-foreground"
+                    >
+                      {row.team.name}
+                    </Link>
+                    <TeamProjects team={row.team} className="truncate text-[9px]" />
+                  </span>
                   <span className="shrink-0 font-mono text-[9.5px] leading-none text-[var(--faint)]">
                     P {row.played}
                   </span>

@@ -7,6 +7,7 @@ import { MatchMeta } from "@/components/league/match-meta";
 import { MatchStatusBadge } from "@/components/league/match-status-badge";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import { STADIUM, formatMatchDate, type MatchWithTeams } from "@/data/league";
 
 const matchColumns =
@@ -140,6 +141,7 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
                     <span className="text-center text-[12.5px] font-extrabold leading-tight">
                       {match.homeTeam.name}
                     </span>
+                    <TeamProjects team={match.homeTeam} className="text-center text-[9px]" />
                   </Link>
                   <span className="mt-2 justify-self-center rounded-[11px] border border-border px-3 py-2 font-heading text-sm leading-none tracking-[0.06em] text-muted-foreground">
                     {match.homeScore === null || match.awayScore === null
@@ -151,6 +153,7 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
                     <span className="text-center text-[12.5px] font-extrabold leading-tight">
                       {match.awayTeam.name}
                     </span>
+                    <TeamProjects team={match.awayTeam} className="text-center text-[9px]" />
                   </Link>
                 </div>
                 {match.videoHighlightUrl ? (
@@ -185,13 +188,16 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
 
                 {/* Only the name is a link, so the rest of the row is inert on hover. */}
                 <span className="flex min-w-0 items-center justify-end gap-2.5">
-                  {/* leading-tight, not leading-none: truncate clips descenders otherwise */}
-                  <Link
-                    href={`/teams/${match.homeTeam.id}`}
-                    className="truncate text-right text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
-                  >
-                    {match.homeTeam.name}
-                  </Link>
+                  <span className="flex min-w-0 flex-col items-end gap-0.5">
+                    {/* leading-tight, not leading-none: truncate clips descenders otherwise */}
+                    <Link
+                      href={`/teams/${match.homeTeam.id}`}
+                      className="max-w-full truncate text-right text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
+                    >
+                      {match.homeTeam.name}
+                    </Link>
+                    <TeamProjects team={match.homeTeam} className="max-w-full truncate text-right" />
+                  </span>
                   <TeamLogo team={match.homeTeam} size="row" shape="bare" />
                 </span>
 
@@ -203,12 +209,15 @@ export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
 
                 <span className="flex min-w-0 items-center gap-2.5">
                   <TeamLogo team={match.awayTeam} size="row" shape="bare" />
-                  <Link
-                    href={`/teams/${match.awayTeam.id}`}
-                    className="truncate text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
-                  >
-                    {match.awayTeam.name}
-                  </Link>
+                  <span className="flex min-w-0 flex-col items-start gap-0.5">
+                    <Link
+                      href={`/teams/${match.awayTeam.id}`}
+                      className="max-w-full truncate text-[14.5px] font-extrabold leading-tight transition-colors hover:text-[var(--pink)]"
+                    >
+                      {match.awayTeam.name}
+                    </Link>
+                    <TeamProjects team={match.awayTeam} className="max-w-full truncate" />
+                  </span>
                 </span>
 
                 <span className="col-span-3 justify-self-start empty:hidden md:col-span-1 md:justify-self-end">

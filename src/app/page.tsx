@@ -7,6 +7,7 @@ import { MatchStatusBadge } from "@/components/league/match-status-badge";
 import { MobileHome } from "@/components/league/mobile-home";
 import { SectionHeading } from "@/components/league/section-heading";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import {
   ROUNDS,
   STADIUM,
@@ -110,12 +111,20 @@ export default async function Home() {
                   <span className="text-center text-[13px] font-extrabold leading-tight">
                     {opener.homeTeam.name}
                   </span>
+                  {/* On the coloured hero the muted token is unreadable, so the
+                      projects line uses the hero's own white-on-tint scale. */}
+                  <span className="text-center text-[9.5px] font-semibold leading-tight text-white/70">
+                    {opener.homeTeam.projects}
+                  </span>
                 </div>
                 <span className="font-heading text-[15px] tracking-[0.08em] text-white/70">VS</span>
                 <div className="flex flex-col items-center gap-2">
                   <TeamLogo team={opener.awayTeam} size="lg" />
                   <span className="text-center text-[13px] font-extrabold leading-tight">
                     {opener.awayTeam.name}
+                  </span>
+                  <span className="text-center text-[9.5px] font-semibold leading-tight text-white/70">
+                    {opener.awayTeam.projects}
                   </span>
                 </div>
               </div>
@@ -239,12 +248,15 @@ export default async function Home() {
                   </span>
                   <span className="flex min-w-0 items-center gap-2.5">
                     <TeamLogo team={row.team} />
-                    <Link
-                      href={`/teams/${row.teamId}`}
-                      className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
-                    >
-                      {row.team.name}
-                    </Link>
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <Link
+                        href={`/teams/${row.teamId}`}
+                        className="truncate text-[14.5px] font-extrabold leading-tight text-foreground hover:text-[var(--pink)]"
+                      >
+                        {row.team.name}
+                      </Link>
+                      <TeamProjects team={row.team} className="truncate" />
+                    </span>
                   </span>
                   <span className="grad-text text-center font-heading text-[22px] leading-none">
                     {row.points}
@@ -308,8 +320,14 @@ export default async function Home() {
                   </div>
                   <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2.5">
                     <span className="flex min-w-0 items-center justify-end gap-2">
-                      <span className="truncate text-right text-sm font-extrabold">
-                        {match.homeTeam.name}
+                      <span className="flex min-w-0 flex-col items-end gap-0.5">
+                        <span className="max-w-full truncate text-right text-sm font-extrabold">
+                          {match.homeTeam.name}
+                        </span>
+                        <TeamProjects
+                          team={match.homeTeam}
+                          className="max-w-full truncate text-right text-[9px]"
+                        />
                       </span>
                       <TeamLogo team={match.homeTeam} size="sm" />
                     </span>
@@ -318,7 +336,15 @@ export default async function Home() {
                     </span>
                     <span className="flex min-w-0 items-center gap-2">
                       <TeamLogo team={match.awayTeam} size="sm" />
-                      <span className="truncate text-sm font-extrabold">{match.awayTeam.name}</span>
+                      <span className="flex min-w-0 flex-col items-start gap-0.5">
+                        <span className="max-w-full truncate text-sm font-extrabold">
+                          {match.awayTeam.name}
+                        </span>
+                        <TeamProjects
+                          team={match.awayTeam}
+                          className="max-w-full truncate text-[9px]"
+                        />
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -399,14 +425,23 @@ export default async function Home() {
                 <div className="flex items-center justify-between gap-3">
                   <span className="flex min-w-0 items-center gap-2.5">
                     <TeamLogo team={match.homeTeam} size="md" />
-                    <span className="truncate text-sm font-extrabold leading-tight">
-                      {match.homeTeam.name}
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <span className="truncate text-sm font-extrabold leading-tight">
+                        {match.homeTeam.name}
+                      </span>
+                      <TeamProjects team={match.homeTeam} className="truncate text-[9px]" />
                     </span>
                   </span>
                   <span className="font-mono text-[11px] leading-none text-[var(--faint)]">vs</span>
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <span className="truncate text-sm font-extrabold leading-tight">
-                      {match.awayTeam.name}
+                    <span className="flex min-w-0 flex-col items-end gap-0.5">
+                      <span className="max-w-full truncate text-right text-sm font-extrabold leading-tight">
+                        {match.awayTeam.name}
+                      </span>
+                      <TeamProjects
+                        team={match.awayTeam}
+                        className="max-w-full truncate text-right text-[9px]"
+                      />
                     </span>
                     <TeamLogo team={match.awayTeam} size="md" />
                   </span>

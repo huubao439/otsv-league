@@ -5,6 +5,8 @@ export interface Team {
   abbr: string;
   /** Department the team represents, shown as the team's subtitle. */
   department: string;
+  /** Projects making up the team, shown under the team name across the site. */
+  projects: string;
   logo: string;
   colorCode: string;
   /** CSS gradient used for the team's crest tile and hero banner. */

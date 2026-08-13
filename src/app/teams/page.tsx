@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import { standingsWithTeamsFrom } from "@/data/league";
 import { teams } from "@/data/mock";
 import { getMatches, getRoster } from "@/lib/server/league-data";
@@ -89,6 +90,7 @@ export default async function TeamsPage() {
 
               <span className="relative flex flex-col gap-1.5">
                 <span className="font-heading text-[27px] uppercase leading-none">{team.name}</span>
+                <TeamProjects team={team} className="text-[11px]" />
               </span>
 
               <span className="relative grid grid-cols-4 gap-2 border-t border-border pt-3.5">

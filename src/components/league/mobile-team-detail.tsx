@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FormGuide } from "@/components/league/form-guide";
 import { TeamLogo } from "@/components/league/team-logo";
+import { TeamProjects } from "@/components/league/team-projects";
 import { type FormResult } from "@/data/league";
 import { type MatchStatus, type Team } from "@/lib/types";
 
@@ -91,6 +92,9 @@ export function MobileTeamDetail({
             />
             <div className="flex min-w-0 flex-col gap-2">
               <h1 className="m-0 font-heading text-[38px] uppercase leading-[0.94]">{team.name}</h1>
+              <span className="text-[11px] font-semibold leading-tight text-white/80">
+                {team.projects}
+              </span>
               <span className="flex items-center gap-2.5 text-[12px] font-semibold leading-none text-white/85">
                 Form
                 <FormGuide form={form} />
@@ -154,8 +158,11 @@ export function MobileTeamDetail({
                   R{match.round}
                 </span>
                 <TeamLogo team={match.opponent} size="ml" shape="squircle" />
-                <span className="min-w-0 flex-1 truncate text-[13.5px] font-extrabold leading-tight">
-                  {match.opponent.name}
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="truncate text-[13.5px] font-extrabold leading-tight">
+                    {match.opponent.name}
+                  </span>
+                  <TeamProjects team={match.opponent} className="truncate text-[9px]" />
                 </span>
                 {match.scoreLine ? (
                   <span className="shrink-0 rounded-lg border border-border px-2.5 py-1.5 font-heading text-sm leading-none">
