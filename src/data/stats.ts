@@ -54,6 +54,29 @@ export function statsForPlayer(
   return stats.get(playerId) ?? EMPTY_LINE;
 }
 
+export type Placed<T> = T & { position: number };
+
+/**
+ * Adds the leaderboard position to an already sorted list, using competition
+ * ranking: rows holding the same value share a position, and the next distinct
+ * value skips the places the tie used up (1, 2, 2, 4). Without this, three
+ * players level on goals would read as 4th, 5th and 6th rather than joint 4th.
+ */
+export function withPositions<T>(rows: T[], valueOf: (row: T) => number): Placed<T>[] {
+  let position = 0;
+  let previous = Number.NaN;
+
+  return rows.map((row, index) => {
+    const value = valueOf(row);
+    if (index === 0 || value !== previous) {
+      position = index + 1;
+      previous = value;
+    }
+
+    return { ...row, position };
+  });
+}
+
 export type ScorerRow = { player: Player; goals: number };
 
 /** Golden boot standings, highest scorer first. */

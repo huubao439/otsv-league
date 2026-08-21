@@ -212,7 +212,7 @@ export default async function StandingsPage() {
             <h3 className="m-0 font-heading text-[19px] uppercase">Tiebreakers</h3>
             {/* Order mirrors the Tournament Rules (section I.3). */}
             <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-4.5 text-[12.5px] font-semibold leading-[1.4] text-muted-foreground">
-              <li>Head-to-head result</li>
+              <li>Head-to-head result — once those teams have met</li>
               <li>Goal difference</li>
               <li>Goals scored</li>
               <li>Fair-play index</li>

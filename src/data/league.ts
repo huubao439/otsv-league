@@ -55,6 +55,39 @@ function headToHead(source: Match[], groupIds: Set<number>) {
   return acc;
 }
 
+/** Key for an unordered pair of team ids. */
+function pairKey(a: number, b: number) {
+  return a < b ? `${a}-${b}` : `${b}-${a}`;
+}
+
+/**
+ * True once every team in the group has played every other team in it, which is
+ * what makes a head-to-head mini-league a fair comparison between them.
+ */
+function allPairsPlayed(source: Match[], ids: number[]): boolean {
+  const groupIds = new Set(ids);
+  const met = new Set<string>();
+
+  for (const match of source) {
+    if (match.status !== "finished" || match.homeScore === null || match.awayScore === null) {
+      continue;
+    }
+    if (groupIds.has(match.homeTeamId) && groupIds.has(match.awayTeamId)) {
+      met.add(pairKey(match.homeTeamId, match.awayTeamId));
+    }
+  }
+
+  for (let i = 0; i < ids.length; i += 1) {
+    for (let j = i + 1; j < ids.length; j += 1) {
+      if (!met.has(pairKey(ids[i], ids[j]))) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 /**
  * Orders the table by the Tournament Rules (section I.3): points first, then
  * within a group tied on points — head-to-head result, goal difference, goals
@@ -62,7 +95,10 @@ function headToHead(source: Match[], groupIds: Set<number>) {
  * standing in for the drawing of lots.
  *
  * Head-to-head is a mini-league over just the tied teams' mutual matches, so a
- * three-way tie uses the points among those three, as the rules require.
+ * three-way tie uses the points among those three, as the rules require. It is
+ * only applied once all of them have met: mid-season, teams that have not yet
+ * played each other are separated by goal difference — the next criterion —
+ * rather than by an incomplete mini-league.
  */
 function orderStandings(
   rows: Standing[],
@@ -80,14 +116,17 @@ function orderStandings(
 
     const group = byPoints.slice(start, end);
     if (group.length > 1) {
-      const ids = new Set(group.map((row) => row.teamId));
-      const h2h = headToHead(source, ids);
+      const ids = group.map((row) => row.teamId);
+      // Only rank on head-to-head once every tied team has met every other one.
+      // While a fixture between them is still to come the mini-league is
+      // incomplete — a team would be judged on matches it has not played yet —
+      // so the criterion is skipped and goal difference decides instead.
+      const h2h = allPairsPlayed(source, ids) ? headToHead(source, new Set(ids)) : null;
 
       group.sort((a, b) => {
-        const ha = h2h.get(a.teamId)!;
-        const hb = h2h.get(b.teamId)!;
+        const h2hPoints = h2h ? h2h.get(b.teamId)!.pts - h2h.get(a.teamId)!.pts : 0;
         return (
-          hb.pts - ha.pts || // 1. head-to-head points
+          h2hPoints || // 1. head-to-head points (skipped until they have all met)
           b.goalDifference - a.goalDifference || // 2. overall goal difference
           b.goalsFor - a.goalsFor || // 3. overall goals scored
           (fairPlayPenalty.get(a.teamId) ?? 0) - (fairPlayPenalty.get(b.teamId) ?? 0) || // 4. fair play

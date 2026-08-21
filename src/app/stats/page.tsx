@@ -6,6 +6,7 @@ import {
   YELLOW_CARD_FINE,
   fairPlayTableFrom,
   topScorersFrom,
+  withPositions,
 } from "@/data/stats";
 import { getMatches, getRoster } from "@/lib/server/league-data";
 import { formatFine, formatVnd } from "@/lib/vnd";
@@ -17,8 +18,10 @@ export default async function StatsPage() {
 
   // Every table below is derived from the match results an admin records, so
   // the Stats tab always agrees with Fixtures and Standings.
-  const topScorers = topScorersFrom(allMatches, roster, 10);
-  const defence = cleanSheetTableFrom(allMatches);
+  // Players and teams level on the headline number share a position, so a
+  // three-way tie on goals reads 4, 4, 4 rather than 4, 5, 6.
+  const topScorers = withPositions(topScorersFrom(allMatches, roster, 10), (row) => row.goals);
+  const defence = withPositions(cleanSheetTableFrom(allMatches), (row) => row.goalsAgainst);
   const fairPlay = fairPlayTableFrom(allMatches, roster);
   const totalFines = fairPlay.reduce((total, row) => total + row.fine, 0);
 
@@ -46,20 +49,20 @@ export default async function StatsPage() {
 
           <div className="flex flex-col gap-2.5">
             {topScorers.length
-              ? topScorers.map((row, index) => {
+              ? topScorers.map((row) => {
                   const team = getTeamById(row.player.teamId);
 
                   return (
                     <div
                       key={row.player.id}
                       className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 ${
-                        index === 0
+                        row.position === 1
                           ? "border-[var(--border-strong)] bg-[image:var(--grad-soft)]"
                           : "border-border bg-[var(--surface-2)]"
                       }`}
                     >
                       <span className="w-4 shrink-0 font-mono text-[10.5px] text-[var(--faint)]">
-                        {index + 1}
+                        {row.position}
                       </span>
                       {team ? <TeamLogo team={team} size="sm" /> : null}
                       <span className="min-w-0 flex-1 truncate text-[13px]">
@@ -103,20 +106,20 @@ export default async function StatsPage() {
                 <span className="text-right">GA</span>
               </div>
 
-              {defence.map((row, index) => (
+              {defence.map((row) => (
                 <div
                   key={row.team.id}
                   className={`relative grid ${defenceColumns} items-center border-b border-border py-3 pl-3 last:border-b-0 ${
-                    index === 0 ? "bg-[image:var(--grad-soft)]" : ""
+                    row.position === 1 ? "bg-[image:var(--grad-soft)]" : ""
                   }`}
                 >
-                  {index === 0 ? (
+                  {row.position === 1 ? (
                     <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
                   ) : null}
                   <span
-                    className={`font-heading text-[17px] ${index === 0 ? "" : "text-muted-foreground"}`}
+                    className={`font-heading text-[17px] ${row.position === 1 ? "" : "text-muted-foreground"}`}
                   >
-                    {index + 1}
+                    {row.position}
                   </span>
                   <span className="flex min-w-0 items-center gap-2.5">
                     <TeamLogo team={row.team} size="sm" />
