@@ -22,6 +22,10 @@ export default async function StatsPage() {
   // three-way tie on goals reads 4, 4, 4 rather than 4, 5, 6.
   const topScorers = withPositions(topScorersFrom(allMatches, roster, 10), (row) => row.goals);
   const defence = withPositions(cleanSheetTableFrom(allMatches), (row) => row.goalsAgainst);
+  // Before a ball is kicked every team has conceded none and sits joint first,
+  // which is not a lead worth painting gold — the highlight waits until the
+  // table separates.
+  const defenceHasLeader = defence.some((row) => row.position !== 1);
   const fairPlay = fairPlayTableFrom(allMatches, roster);
   const totalFines = fairPlay.reduce((total, row) => total + row.fine, 0);
 
@@ -110,14 +114,16 @@ export default async function StatsPage() {
                 <div
                   key={row.team.id}
                   className={`relative grid ${defenceColumns} items-center border-b border-border py-3 pl-3 last:border-b-0 ${
-                    row.position === 1 ? "bg-[image:var(--grad-soft)]" : ""
+                    defenceHasLeader && row.position === 1 ? "bg-[image:var(--grad-soft)]" : ""
                   }`}
                 >
-                  {row.position === 1 ? (
+                  {defenceHasLeader && row.position === 1 ? (
                     <span className="absolute bottom-0 left-0 top-0 w-[3px] bg-[image:var(--grad)]" />
                   ) : null}
                   <span
-                    className={`font-heading text-[17px] ${row.position === 1 ? "" : "text-muted-foreground"}`}
+                    className={`font-heading text-[17px] ${
+                      defenceHasLeader && row.position === 1 ? "" : "text-muted-foreground"
+                    }`}
                   >
                     {row.position}
                   </span>

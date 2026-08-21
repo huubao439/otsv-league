@@ -26,8 +26,9 @@ const statValue = "font-heading text-[20px] leading-none";
 
 export default async function TeamsPage() {
   const [allMatches, roster] = await Promise.all([getMatches(), getRoster()]);
+  // Cards follow the league table, so the grid reads leader first — same order
+  // as Standings rather than the order the departments registered in.
   const table = standingsWithTeamsFrom(allMatches, roster);
-  const rankOf = (teamId: number) => table.findIndex((row) => row.teamId === teamId) + 1;
 
   return (
     <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5.5 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up">
@@ -38,10 +39,10 @@ export default async function TeamsPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {teams.map((team) => {
-          const standing = table.find((row) => row.teamId === team.id);
-          const rank = rankOf(team.id);
-          const goalDifference = standing?.goalDifference ?? 0;
+        {table.map((standing, index) => {
+          const team = standing.team;
+          const rank = index + 1;
+          const goalDifference = standing.goalDifference;
 
           return (
             <Link
@@ -95,11 +96,11 @@ export default async function TeamsPage() {
 
               <span className="relative grid grid-cols-4 gap-2 border-t border-border pt-3.5">
                 <span className="flex flex-col gap-1">
-                  <span className={statValue}>{standing?.played ?? 0}</span>
+                  <span className={statValue}>{standing.played}</span>
                   <span className={statLabel}>Played</span>
                 </span>
                 <span className="flex flex-col gap-1">
-                  <span className={statValue}>{standing?.won ?? 0}</span>
+                  <span className={statValue}>{standing.won}</span>
                   <span className={statLabel}>Won</span>
                 </span>
                 <span className="flex flex-col gap-1">
@@ -109,7 +110,7 @@ export default async function TeamsPage() {
                   <span className={statLabel}>GD</span>
                 </span>
                 <span className="flex flex-col gap-1">
-                  <span className={`${statValue} grad-text`}>{standing?.points ?? 0}</span>
+                  <span className={`${statValue} grad-text`}>{standing.points}</span>
                   <span className={statLabel}>Points</span>
                 </span>
               </span>
