@@ -15,9 +15,25 @@ const matchColumns =
 
 export type FixtureRound = { round: number; matches: MatchWithTeams[] };
 
+/**
+ * The round the board opens on: the first one still to be completed, so once
+ * every match of a round has been played the landing view moves on to the next
+ * one instead of sitting on Round 1 all season. A round with no fixtures yet
+ * counts as still to come. Once the whole season is played the last round
+ * stays selected.
+ */
+function firstUnplayedRound(rounds: FixtureRound[]): number {
+  const pending = rounds.find(
+    (entry) =>
+      entry.matches.length === 0 || entry.matches.some((match) => match.status !== "finished"),
+  );
+
+  return pending?.round ?? rounds.at(-1)?.round ?? 1;
+}
+
 /** Round tabs are local UI state; the fixtures themselves come from the server. */
 export function FixturesBoard({ rounds }: { rounds: FixtureRound[] }) {
-  const [activeRound, setActiveRound] = useState(rounds.at(0)?.round ?? 1);
+  const [activeRound, setActiveRound] = useState(() => firstUnplayedRound(rounds));
   const visible = rounds.filter((entry) => entry.round === activeRound);
   const totalMatches = rounds.reduce((total, entry) => total + entry.matches.length, 0);
 

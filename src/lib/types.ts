@@ -44,14 +44,17 @@ export type PlayerImportRow = PlayerDraft & { teamId: number };
 
 export type MatchStatus = "upcoming" | "live" | "finished";
 
-export type MatchEventType = "goal" | "yellow" | "red";
+export type MatchEventType = "goal" | "own-goal" | "yellow" | "red";
 
 export interface MatchEvent {
   id: string;
-  playerId: number;
+  /** Whose event it is, or null for an own goal — nobody is credited with one. */
+  playerId: number | null;
   type: MatchEventType;
   /** Goals scored by this player. Always 1 for cards. */
   count: number;
+  /** Own goals only: the team the goal counted for, since there is no scorer. */
+  teamId?: number;
 }
 
 export interface Match {

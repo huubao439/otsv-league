@@ -17,6 +17,10 @@ const cardLabels: Record<"yellow" | "red", string> = {
   red: "Red card",
 };
 
+/** Scorer-picker value standing in for "no scorer", and how it reads in lists. */
+const OWN_GOAL = "own-goal";
+const OWN_GOAL_LABEL = "OG (own goal)";
+
 const fieldClass =
   "rounded-xl border border-border bg-[var(--surface-2)] px-3 py-2 text-sm font-semibold text-foreground outline-none transition-colors focus:border-[var(--pink)]";
 const labelClass =
@@ -50,18 +54,18 @@ function EntryList({
     <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
       {entries.map((event) => {
         const player = squad.find((entry) => entry.id === event.playerId);
+        const label =
+          event.type === "own-goal" ? OWN_GOAL_LABEL : (player?.name ?? "Unknown player");
 
         return (
           <li key={event.id} className={entryRowClass}>
-            <span className="min-w-0 flex-1 truncate text-[12.5px] font-bold">
-              {player ? player.name : "Unknown player"}
-            </span>
+            <span className="min-w-0 flex-1 truncate text-[12.5px] font-bold">{label}</span>
             <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--faint)]">
               {describe(event)}
             </span>
             <button
               type="button"
-              aria-label={`Remove entry for ${player ? player.name : "player"}`}
+              aria-label={`Remove entry for ${label}`}
               onClick={() => onRemove(event.id)}
               className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-[var(--pink)] hover:text-[var(--pink)]"
             >
@@ -93,10 +97,20 @@ function GoalSide({
     if (!playerId) {
       return;
     }
-    onChange([
-      ...events,
-      { id: newEventId(), playerId: Number(playerId), type: "goal", count: Number(count) },
-    ]);
+    // An own goal counts for this team but is credited to nobody, so it is
+    // stored against the team rather than a scorer.
+    const event: MatchEvent =
+      playerId === OWN_GOAL
+        ? {
+            id: newEventId(),
+            playerId: null,
+            type: "own-goal",
+            count: Number(count),
+            teamId: team.id,
+          }
+        : { id: newEventId(), playerId: Number(playerId), type: "goal", count: Number(count) };
+
+    onChange([...events, event]);
     setPlayerId("");
     setCount("1");
   };
@@ -117,6 +131,7 @@ function GoalSide({
           onChange={(event) => setPlayerId(event.target.value)}
         >
           <option value="">Select player…</option>
+          <option value={OWN_GOAL}>{OWN_GOAL_LABEL}</option>
           {squad.map((player) => (
             <option key={player.id} value={player.id}>
               {player.shirtNumber}. {player.name}
@@ -272,11 +287,18 @@ function MatchEditor({
   const awaySquad = squadOf(match.awayTeam.id);
   const homeIds = new Set(homeSquad.map((player) => player.id));
 
-  const bySide = (type: (event: MatchEvent) => boolean, home: boolean) =>
-    events.filter((event) => type(event) && homeIds.has(event.playerId) === home);
+  // Which half of the editor an event belongs to. An own goal has no scorer, so
+  // it sits with the team it counted for rather than with a squad.
+  const isHomeSide = (event: MatchEvent) =>
+    event.type === "own-goal"
+      ? event.teamId === match.homeTeam.id
+      : event.playerId !== null && homeIds.has(event.playerId);
 
-  const isGoal = (event: MatchEvent) => event.type === "goal";
-  const isCard = (event: MatchEvent) => event.type !== "goal";
+  const bySide = (type: (event: MatchEvent) => boolean, home: boolean) =>
+    events.filter((event) => type(event) && isHomeSide(event) === home);
+
+  const isGoal = (event: MatchEvent) => event.type === "goal" || event.type === "own-goal";
+  const isCard = (event: MatchEvent) => event.type === "yellow" || event.type === "red";
 
   const homeGoals = bySide(isGoal, true);
   const awayGoals = bySide(isGoal, false);
@@ -348,7 +370,10 @@ function MatchEditor({
       ) : null}
 
       <section className="flex flex-col gap-3">
-        <SectionHeader title="Goals" hint="Pick a scorer and how many they scored." />
+        <SectionHeader
+          title="Goals"
+          hint="Pick a scorer and how many they scored, or OG for an own goal."
+        />
         <div className="grid gap-3 md:grid-cols-2">
           <GoalSide
             team={match.homeTeam}

@@ -19,6 +19,9 @@ const EMPTY_LINE: PlayerStatLine = { goals: 0, yellowCards: 0, redCards: 0 };
  * fields stored on a player record are never counted here, otherwise a scorer
  * would be tallied twice.
  *
+ * Own goals are skipped outright: they count towards the team that benefited
+ * from them, never towards any player's tally.
+ *
  * Only finished matches count, matching how the standings are calculated.
  */
 export function playerStatsFrom(source: Match[]): Map<number, PlayerStatLine> {
@@ -30,6 +33,10 @@ export function playerStatsFrom(source: Match[]): Map<number, PlayerStatLine> {
     }
 
     for (const event of match.events) {
+      if (event.type === "own-goal" || event.playerId === null) {
+        continue;
+      }
+
       const line = stats.get(event.playerId) ?? { ...EMPTY_LINE };
 
       if (event.type === "goal") {
@@ -79,15 +86,19 @@ export function withPositions<T>(rows: T[], valueOf: (row: T) => number): Placed
 
 export type ScorerRow = { player: Player; goals: number };
 
-/** Golden boot standings, highest scorer first. */
-export function topScorersFrom(source: Match[], roster: Player[], limit = 10): ScorerRow[] {
+/**
+ * Golden boot standings, highest scorer first. Without a `limit` every player
+ * who has scored is returned, which is what the full-table page shows.
+ */
+export function topScorersFrom(source: Match[], roster: Player[], limit?: number): ScorerRow[] {
   const stats = playerStatsFrom(source);
 
-  return roster
+  const rows = roster
     .map((player) => ({ player, goals: statsForPlayer(stats, player.id).goals }))
     .filter((row) => row.goals > 0)
-    .sort((a, b) => b.goals - a.goals || a.player.name.localeCompare(b.player.name))
-    .slice(0, limit);
+    .sort((a, b) => b.goals - a.goals || a.player.name.localeCompare(b.player.name));
+
+  return limit === undefined ? rows : rows.slice(0, limit);
 }
 
 export type FairPlayRow = {

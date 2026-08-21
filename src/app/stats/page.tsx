@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHeading } from "@/components/league/page-heading";
 import { TeamLogo } from "@/components/league/team-logo";
 import { cleanSheetTableFrom, getTeamById } from "@/data/league";
@@ -88,6 +89,14 @@ export default async function StatsPage() {
                   </span>
                 ))}
           </div>
+
+          <Link
+            href="/stats/scorers"
+            data-testid="scorers-full-table-link"
+            className="rounded-2xl border border-border bg-[var(--surface-2)] p-3 text-center text-[12.5px] font-bold leading-none text-foreground transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--surface)]"
+          >
+            View full table →
+          </Link>
         </div>
 
         {/* Best defence */}
