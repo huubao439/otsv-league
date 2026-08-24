@@ -16,6 +16,6 @@
   { "id": 12, "homeTeamId": 5, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-24", "time": "19:30", "pitch": "B2", "status": "upcoming", "round": 4, "videoHighlightUrl": "" },
 
   { "id": 13, "homeTeamId": 4, "awayTeamId": 5, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "18:30", "pitch": "B1", "status": "upcoming", "round": 5, "videoHighlightUrl": "" },
-  { "id": 14, "homeTeamId": 1, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "19:30", "pitch": "B1", "status": "upcoming", "round": 5, "videoHighlightUrl": "" },
-  { "id": 15, "homeTeamId": 3, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "19:30", "pitch": "B2", "status": "upcoming", "round": 5, "videoHighlightUrl": "" }
+  { "id": 15, "homeTeamId": 3, "awayTeamId": 6, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "18:30", "pitch": "B2", "status": "upcoming", "round": 5, "videoHighlightUrl": "" },
+  { "id": 14, "homeTeamId": 1, "awayTeamId": 2, "homeScore": null, "awayScore": null, "date": "2026-08-27", "time": "19:30", "pitch": "B1", "status": "upcoming", "round": 5, "videoHighlightUrl": "" }
 ]
