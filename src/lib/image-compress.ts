@@ -9,7 +9,20 @@
 const MAX_DIMENSION = 1400;
 const MAX_CHARS = 1_200_000; // ~900 KB of image data once base64-encoded
 
+export type CompressedImage = { dataUrl: string; width: number; height: number };
+
+/** Compressed data URL only — the common case. */
 export async function compressImage(file: File): Promise<string> {
+  return (await compressImageWithSize(file)).dataUrl;
+}
+
+/**
+ * As `compressImage`, but also reports the encoded image's pixel size. Callers
+ * that render the image at its natural proportions need this: storing it lets
+ * the `<img>` carry width/height, so the browser reserves the right space and
+ * the page does not jump as the photo loads.
+ */
+export async function compressImageWithSize(file: File): Promise<CompressedImage> {
   const bitmap = await loadBitmap(file);
 
   const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
@@ -29,7 +42,7 @@ export async function compressImage(file: File): Promise<string> {
   for (const quality of [0.82, 0.7, 0.58, 0.45, 0.35]) {
     const dataUrl = canvas.toDataURL("image/jpeg", quality);
     if (dataUrl.length <= MAX_CHARS) {
-      return dataUrl;
+      return { dataUrl, width, height };
     }
   }
 

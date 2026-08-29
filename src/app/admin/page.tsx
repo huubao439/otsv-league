@@ -2,10 +2,20 @@ import { notFound } from "next/navigation";
 import { AdminWorkspace } from "@/components/admin/admin-workspace";
 import { LogoutButton } from "@/components/admin/logout-button";
 import { PageHeading } from "@/components/league/page-heading";
-import { ROUNDS, matchesByRoundFrom } from "@/data/league";
+import {
+  ROUNDS,
+  matchesByRoundFrom,
+  seasonProgressFrom,
+  standingsWithTeamsFrom,
+} from "@/data/league";
 import { teams } from "@/data/mock";
 import { isAdminSession } from "@/lib/admin-auth";
-import { getMatchImageIndex, getMatches, getRoster } from "@/lib/server/league-data";
+import {
+  getChampionPhotoMeta,
+  getMatchImageIndex,
+  getMatches,
+  getRoster,
+} from "@/lib/server/league-data";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +27,15 @@ export default async function AdminPage() {
     notFound();
   }
 
-  const [roster, allMatches, imageIndex] = await Promise.all([
+  const [roster, allMatches, imageIndex, championPhoto] = await Promise.all([
     getRoster(),
     getMatches(),
     getMatchImageIndex(),
+    getChampionPhotoMeta(),
   ]);
+  // Same rule as the home page: the champion is whoever tops the table.
+  const progress = seasonProgressFrom(allMatches);
+  const champion = standingsWithTeamsFrom(allMatches, roster).at(0)?.team;
   const rounds = ROUNDS.map((round) => ({
     round,
     matches: matchesByRoundFrom(allMatches, round),
@@ -40,6 +54,9 @@ export default async function AdminPage() {
         roster={roster}
         rounds={rounds}
         matchImageIds={imageIndex}
+        champion={champion}
+        championPhoto={championPhoto}
+        seasonComplete={progress.total > 0 && progress.played === progress.total}
       />
     </div>
   );

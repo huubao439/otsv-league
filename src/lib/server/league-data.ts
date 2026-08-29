@@ -86,3 +86,37 @@ export async function deleteMatchImage(matchId: number): Promise<void> {
     index.filter((id) => id !== matchId),
   );
 }
+
+/*
+ * The champion team photo shown on the home page. Stored as one data URL, with
+ * a tiny separate meta record so the home page can learn that a photo exists —
+ * and when it changed — without pulling the blob into its render. The photo
+ * itself is served by the /champion-photo route, cache-busted by `updatedAt`.
+ */
+const CHAMPION_PHOTO_KEY = "otsv:champion-photo";
+const CHAMPION_PHOTO_META_KEY = "otsv:champion-photo-meta";
+
+/** `width`/`height` are the stored image's pixel size, absent on photos
+ *  uploaded before it was recorded. */
+export type ChampionPhotoMeta = { updatedAt: number; width?: number; height?: number };
+
+export async function getChampionPhoto(): Promise<string | null> {
+  return kvGet<string>(CHAMPION_PHOTO_KEY);
+}
+
+export async function getChampionPhotoMeta(): Promise<ChampionPhotoMeta | null> {
+  return kvGet<ChampionPhotoMeta>(CHAMPION_PHOTO_META_KEY);
+}
+
+export async function saveChampionPhoto(
+  dataUrl: string,
+  size?: { width: number; height: number },
+): Promise<void> {
+  await kvSet(CHAMPION_PHOTO_KEY, dataUrl);
+  await kvSet<ChampionPhotoMeta>(CHAMPION_PHOTO_META_KEY, { updatedAt: Date.now(), ...size });
+}
+
+export async function deleteChampionPhoto(): Promise<void> {
+  await kvSet(CHAMPION_PHOTO_KEY, null);
+  await kvSet(CHAMPION_PHOTO_META_KEY, null);
+}

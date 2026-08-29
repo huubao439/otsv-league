@@ -75,6 +75,35 @@
   --grad-gold-soft: linear-gradient(120deg, oklch(0.82 0.15 92 / 0.22) 0%, oklch(0.7 0.16 68 / 0.07) 100%);
   --on-grad: #fff;
 
+  /*
+   * Champion badge. A self-contained palette rather than the page tokens: the
+   * banner is a pale gold card in light mode and a deep plum one in dark, so
+   * its foreground, confetti and spark colours have to flip with it.
+   */
+  --champ: linear-gradient(155deg, oklch(0.96 0.045 98) 0%, oklch(0.91 0.095 92) 46%, oklch(0.85 0.115 80) 100%);
+  --champ-glow: radial-gradient(95% 75% at 50% -12%, oklch(1 0.02 100 / 0.85) 0%, oklch(0.97 0.07 96 / 0.3) 40%, transparent 72%);
+  --champ-pill: linear-gradient(120deg, oklch(0.3 0.07 50), oklch(0.36 0.09 38));
+  --champ-pill-fg: oklch(0.95 0.12 94);
+  --champ-fg: oklch(0.26 0.06 52);
+  --champ-fg-soft: oklch(0.36 0.055 50);
+  --champ-fg-faint: oklch(0.46 0.05 50);
+  --champ-line: oklch(0.5 0.07 55 / 0.35);
+  --champ-shine: linear-gradient(100deg, oklch(0.3 0.07 50) 20%, oklch(0.66 0.16 72) 40%, oklch(0.3 0.07 50) 60%);
+  --champ-ring: oklch(0.62 0.14 70 / 0.55);
+  --champ-burst-1: radial-gradient(circle, oklch(0.72 0.16 72 / 0.45) 0%, oklch(0.72 0.16 72 / 0.1) 42%, transparent 62%);
+  --champ-burst-2: radial-gradient(circle, oklch(0.6 0.23 355 / 0.3) 0%, oklch(0.6 0.23 355 / 0.08) 44%, transparent 64%);
+  --champ-burst-3: radial-gradient(circle, oklch(0.55 0.18 300 / 0.22) 0%, transparent 60%);
+  --champ-spark-a: oklch(0.62 0.16 72);
+  --champ-spark-b: oklch(0.42 0.1 55);
+  --champ-spark-c: oklch(0.58 0.2 40);
+  --champ-spark2-a: oklch(0.52 0.22 355);
+  --champ-spark2-b: oklch(0.42 0.1 55);
+  --champ-spark2-c: oklch(0.52 0.18 300);
+  --champ-confetti-a: oklch(0.62 0.16 78);
+  --champ-confetti-b: oklch(0.55 0.23 355);
+  --champ-confetti-c: oklch(0.5 0.18 300);
+  --champ-confetti-d: oklch(0.38 0.09 55);
+
   --bg: oklch(0.985 0.008 340);
   --bg-deep: oklch(0.955 0.014 340);
   --surface: oklch(1 0 0 / 0.86);
@@ -125,6 +154,31 @@
   --gold: oklch(0.85 0.15 88);
   --grad-gold: linear-gradient(120deg, oklch(0.9 0.15 92) 0%, oklch(0.78 0.16 68) 100%);
   --grad-gold-soft: linear-gradient(120deg, oklch(0.9 0.15 92 / 0.18) 0%, oklch(0.78 0.16 68 / 0.05) 100%);
+
+  /* Champion badge, dark: deep plum card, gold-on-white lettering. */
+  --champ: linear-gradient(155deg, oklch(0.24 0.09 320) 0%, oklch(0.17 0.06 328) 48%, oklch(0.12 0.035 300) 100%);
+  --champ-glow: radial-gradient(90% 70% at 50% -10%, oklch(0.52 0.2 330 / 0.55) 0%, transparent 62%);
+  --champ-pill: linear-gradient(120deg, oklch(0.92 0.15 92), oklch(0.8 0.16 68));
+  --champ-pill-fg: oklch(0.26 0.07 60);
+  --champ-fg: #fff;
+  --champ-fg-soft: oklch(1 0 0 / 0.85);
+  --champ-fg-faint: oklch(1 0 0 / 0.68);
+  --champ-line: oklch(1 0 0 / 0.25);
+  --champ-shine: linear-gradient(100deg, #fff 20%, oklch(0.94 0.14 92) 40%, #fff 60%);
+  --champ-ring: oklch(0.92 0.16 92 / 0.5);
+  --champ-burst-1: radial-gradient(circle, oklch(0.92 0.16 92 / 0.55) 0%, oklch(0.92 0.16 92 / 0.12) 42%, transparent 62%);
+  --champ-burst-2: radial-gradient(circle, oklch(0.72 0.24 355 / 0.5) 0%, oklch(0.72 0.24 355 / 0.1) 44%, transparent 64%);
+  --champ-burst-3: radial-gradient(circle, oklch(0.8 0.16 300 / 0.42) 0%, transparent 60%);
+  --champ-spark-a: oklch(0.94 0.15 92);
+  --champ-spark-b: #fff;
+  --champ-spark-c: oklch(0.78 0.2 40);
+  --champ-spark2-a: oklch(0.8 0.22 355);
+  --champ-spark2-b: #fff;
+  --champ-spark2-c: oklch(0.85 0.16 300);
+  --champ-confetti-a: oklch(0.92 0.16 92);
+  --champ-confetti-b: oklch(0.72 0.24 355);
+  --champ-confetti-c: oklch(0.8 0.16 300);
+  --champ-confetti-d: #fff;
 
   --bg: oklch(0.148 0.032 338);
   --bg-deep: oklch(0.115 0.028 335);
@@ -282,5 +336,115 @@
   .animate-fade-up-delayed,
   .animate-fade-up-more {
     animation: none;
+  }
+}
+
+/*
+ * Champion badge animations, carried over from the design: a slow trophy float,
+ * a gold sweep across the winning team's name, and the burst / spark / confetti
+ * celebration behind it. All decorative, so all disabled for reduced motion.
+ */
+@keyframes champ-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes champ-shine {
+  0% {
+    background-position: -140% 0;
+  }
+  100% {
+    background-position: 240% 0;
+  }
+}
+
+@keyframes champ-burst {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes champ-spark {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes champ-confetti {
+  0% {
+    transform: translateY(-20px) rotate(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--fall, 320px)) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+.animate-champ-float {
+  animation: champ-float 4.6s ease-in-out infinite;
+}
+
+.animate-champ-burst {
+  animation: champ-burst 3.4s ease-out infinite;
+}
+
+.animate-champ-spark {
+  animation: champ-spark 3.4s ease-out infinite;
+}
+
+.animate-champ-confetti {
+  animation: champ-confetti 5.2s linear infinite;
+}
+
+/* The champion's name, filled with the sweeping gold gradient. */
+.champ-name {
+  background-image: var(--champ-shine);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: champ-shine 5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-champ-float,
+  .animate-champ-burst,
+  .animate-champ-spark,
+  .animate-champ-confetti,
+  .champ-name {
+    animation: none;
+  }
+  /* Without the sweep the mid-stop never arrives, so pin it to the bright one. */
+  .champ-name {
+    background-position: 50% 0;
   }
 }

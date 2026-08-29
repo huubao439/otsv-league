@@ -4,9 +4,12 @@ import { revalidatePath, updateTag } from "next/cache";
 import { teams } from "@/data/mock";
 import { LEAGUE_TAG } from "@/lib/server/kv";
 import {
+  deleteChampionPhoto,
   deleteMatchImage,
+  getChampionPhoto,
   getMatchImage,
   getRoster,
+  saveChampionPhoto,
   saveMatchImage,
   saveMatchResult,
   saveRoster,
@@ -215,4 +218,35 @@ export async function saveMatchAction(matchId: number, draft: MatchResultDraft) 
     events: draft.events,
   });
   refresh();
+}
+
+/*
+ * Champion team photo. One image for the whole season, shown in the champion
+ * badge on the home page — so saving it also has to drop the cached home page,
+ * which `refresh()` already does.
+ */
+export async function saveChampionPhotoAction(
+  dataUrl: string,
+  size?: { width: number; height: number },
+): Promise<ImageSaveResult> {
+  if (!dataUrl.startsWith("data:image/")) {
+    return { ok: false, error: "That is not an image." };
+  }
+  if (dataUrl.length > MAX_IMAGE_CHARS) {
+    return { ok: false, error: "Image is too large even after compression." };
+  }
+
+  await saveChampionPhoto(dataUrl, size);
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteChampionPhotoAction() {
+  await deleteChampionPhoto();
+  refresh();
+}
+
+/** The stored data URL, for the admin preview only. */
+export async function getChampionPhotoAction(): Promise<string | null> {
+  return getChampionPhoto();
 }
