@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ChampionBanner } from "@/components/league/champion-banner";
 import { Countdown } from "@/components/league/countdown";
 import { FormGuide } from "@/components/league/form-guide";
 import { MatchMeta } from "@/components/league/match-meta";
@@ -18,7 +19,7 @@ import {
   standingsWithTeamsFrom,
   teamFormFrom,
 } from "@/data/league";
-import { getMatches, getRoster } from "@/lib/server/league-data";
+import { getChampionPhotoMeta, getMatches, getRoster } from "@/lib/server/league-data";
 
 // Pos | Team | Pts | P | W | D | L | GD | Form — points sit first so they read
 // as the headline number rather than a trailing total.
@@ -26,7 +27,12 @@ const tableColumns =
   "grid-cols-[44px_minmax(0,1fr)_56px_40px_40px_40px_40px_52px_92px] min-w-[660px]";
 
 export default async function Home() {
-  const [allMatches, roster] = await Promise.all([getMatches(), getRoster()]);
+  const [allMatches, roster, championPhoto] = await Promise.all([
+    getMatches(),
+    getRoster(),
+    // Meta only — the photo's bytes are served by /champion-photo, not inlined.
+    getChampionPhotoMeta(),
+  ]);
   const table = standingsWithTeamsFrom(allMatches, roster);
   const latestResults = latestResultsFrom(allMatches, 3);
   const upcomingFixtures = nextRoundFixturesFrom(allMatches);
@@ -36,8 +42,29 @@ export default async function Home() {
   const progress = seasonProgressFrom(allMatches);
   const progressPct = Math.max(3, Math.round((progress.played / progress.total) * 100));
 
+  // The champion badge crowns the team at the top of the table. It appears once
+  // the season is played out, or as soon as an admin uploads the champion photo
+  // — uploading is how the title is declared before the last result lands.
+  const champion = table.at(0);
+  const seasonComplete = progress.total > 0 && progress.played === progress.total;
+  const showChampion = Boolean(champion) && (championPhoto !== null || seasonComplete);
+
   return (
     <>
+      {champion && showChampion ? (
+        // Shared by both layouts: the gutters match MobileHome below md and the
+        // desktop column above it, so the badge lines up with whatever follows.
+        <div className="mx-auto w-full max-w-[560px] px-4 pt-4 animate-fade-up md:max-w-[1280px] md:px-6 md:pt-9 lg:px-8">
+          <ChampionBanner
+            team={champion.team}
+            photoVersion={championPhoto?.updatedAt ?? null}
+            photoWidth={championPhoto?.width}
+            photoHeight={championPhoto?.height}
+            seasonComplete={seasonComplete}
+          />
+        </div>
+      ) : null}
+
       {/* Mobile-only layout from the design; the desktop version follows at md. */}
       <MobileHome
         opener={opener}
@@ -49,10 +76,16 @@ export default async function Home() {
         progressPct={progressPct}
         totalTeams={table.length}
         totalRounds={ROUNDS.length}
+        seasonComplete={seasonComplete}
       />
 
       <div className="mx-auto hidden w-full max-w-[1280px] flex-col gap-6 px-4 py-9 pb-18 sm:px-6 lg:px-8 animate-fade-up md:flex">
-      {/* Hero */}
+      {/*
+        Hero. Hidden for the rest of the year once every round has been played —
+        the champion badge above takes its place. Kept in the tree rather than
+        deleted so next season's fixtures bring it straight back.
+      */}
+      {!seasonComplete ? (
       <section className="relative overflow-hidden rounded-[26px] border border-border shadow-[var(--shadow-soft)]">
         <div className="absolute inset-0 bg-[image:var(--grad)] opacity-[0.92]" />
         <div className="absolute inset-0 bg-[radial-gradient(70%_120%_at_88%_12%,oklch(1_0_0/0.22),transparent_60%)]" />
@@ -169,6 +202,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Stat tiles */}
       <section className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">

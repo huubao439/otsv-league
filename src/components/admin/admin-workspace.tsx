@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChampionPhoto } from "@/components/admin/champion-photo";
 import { MatchDetail } from "@/components/admin/match-detail";
 import { TeamsInfo } from "@/components/admin/teams-info";
 import { type FixtureRound } from "@/components/league/fixtures-board";
@@ -10,6 +11,7 @@ import { type Player, type Team } from "@/lib/types";
 const subTabs = [
   { id: "match-detail", label: "Match Detail" },
   { id: "teams-info", label: "Teams Info" },
+  { id: "champion", label: "Champion" },
 ] as const;
 
 type SubTabId = (typeof subTabs)[number]["id"];
@@ -19,11 +21,17 @@ export function AdminWorkspace({
   roster,
   rounds,
   matchImageIds,
+  champion,
+  championPhoto,
+  seasonComplete,
 }: {
   teams: Team[];
   roster: Player[];
   rounds: FixtureRound[];
   matchImageIds: number[];
+  champion?: Team;
+  championPhoto: { updatedAt: number } | null;
+  seasonComplete: boolean;
 }) {
   const [active, setActive] = useState<SubTabId>("match-detail");
 
@@ -60,6 +68,14 @@ export function AdminWorkspace({
         <MatchDetail rounds={rounds} roster={roster} matchImageIds={matchImageIds} />
       ) : null}
       {active === "teams-info" ? <TeamsInfo teams={teams} roster={roster} /> : null}
+      {active === "champion" ? (
+        <ChampionPhoto
+          champion={champion}
+          hasPhoto={championPhoto !== null}
+          photoVersion={championPhoto?.updatedAt ?? null}
+          seasonComplete={seasonComplete}
+        />
+      ) : null}
     </div>
   );
 }

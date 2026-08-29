@@ -38,7 +38,7 @@ const placeholderRadius: Record<Shape, string> = {
 };
 
 /** Perceived lightness, so pale crests get dark lettering instead of white. */
-function isLight(hex: string): boolean {
+export function isLight(hex: string): boolean {
   const value = hex.replace("#", "");
   const r = Number.parseInt(value.slice(0, 2), 16);
   const g = Number.parseInt(value.slice(2, 4), 16);

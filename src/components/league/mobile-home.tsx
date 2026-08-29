@@ -32,6 +32,7 @@ export function MobileHome({
   progressPct,
   totalTeams,
   totalRounds,
+  seasonComplete,
 }: {
   opener?: MatchWithTeams;
   nextRound?: number;
@@ -42,6 +43,7 @@ export function MobileHome({
   progressPct: number;
   totalTeams: number;
   totalRounds: number;
+  seasonComplete: boolean;
 }) {
   const pad = (n: number) => String(n).padStart(2, "0");
   const tiles = [
@@ -52,7 +54,12 @@ export function MobileHome({
 
   return (
     <div className="mx-auto flex w-full max-w-[560px] flex-col gap-3.5 px-4 py-4 animate-fade-up md:hidden">
-      {/* Hero card */}
+      {/*
+        Hero card. Mirrors the desktop rule: once every round has been played it
+        gives way to the champion badge, but stays in the tree so next season
+        brings it back.
+      */}
+      {!seasonComplete ? (
       <section className="relative overflow-hidden rounded-[22px] bg-[image:var(--grad)] p-4 text-white shadow-[0_20px_40px_-24px_oklch(0.4_0.2_340/0.9)]">
         <span
           aria-hidden
@@ -134,6 +141,7 @@ export function MobileHome({
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Stat tiles */}
       <div className="grid grid-cols-3 gap-2.5">
